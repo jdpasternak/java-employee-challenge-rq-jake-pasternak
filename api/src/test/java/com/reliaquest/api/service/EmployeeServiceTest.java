@@ -370,7 +370,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findHighestSalaryOfEmployees_whenEmployeesWithSalariesExist_returnsHighestSalary() throws DownstreamUnavailableException {
+        void findHighestSalaryOfEmployees_whenEmployeesWithSalariesExist_returnsHighestSalary() {
             // Given
             Mockito.when(client.getAll()).thenReturn(testEmployees);
 
