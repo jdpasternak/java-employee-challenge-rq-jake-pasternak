@@ -44,7 +44,8 @@ public class EmployeeService {
     }
 
     public List<Employee> findTopTenHighestEarningEmployees() {
-        return null;
+        List<Employee> employees = client.getAll();
+        return employees;
     }
 
     public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) throws ValidationException {
