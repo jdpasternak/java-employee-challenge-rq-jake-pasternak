@@ -320,7 +320,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findById_whenExists_returnsEmployee() throws EmployeeNotFoundException {
+        void findById_whenExists_returnsEmployee() {
             // Given
             UUID id = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042");
             String name = "Sharda Gibson";
