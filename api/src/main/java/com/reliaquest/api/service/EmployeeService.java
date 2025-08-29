@@ -8,6 +8,7 @@ import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.Valid;
 import jakarta.validation.ValidationException;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
@@ -15,6 +16,7 @@ import org.springframework.validation.annotation.Validated;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Validated
@@ -36,8 +38,8 @@ public class EmployeeService {
                 .toList();
     }
 
-    public Employee findById(String id) throws EmployeeNotFoundException {
-        return null;
+    public Employee findById(@NotNull UUID id) {
+        return client.getById(id);
     }
 
     public Optional<Integer> findHighestSalaryOfEmployees() {
