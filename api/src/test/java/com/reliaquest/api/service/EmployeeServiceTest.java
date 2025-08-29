@@ -591,7 +591,13 @@ class EmployeeServiceTest {
     }
 
     @Nested
+    @SpringBootTest
     class DeleteEmployeeTests {
+        @MockBean
+        EmployeeClient client;
+
+        @Autowired
+        EmployeeService employeeService;
         @Test
         void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
             // Given
