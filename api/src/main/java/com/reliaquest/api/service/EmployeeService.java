@@ -2,7 +2,9 @@ package com.reliaquest.api.service;
 
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.exception.ValidationException;
+import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.Employee;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,6 +12,9 @@ import java.util.Optional;
 
 @Service
 public class EmployeeService {
+
+    @Autowired
+    EmployeeClient client;
 
     public List<Employee> findAll() {
         return null;
