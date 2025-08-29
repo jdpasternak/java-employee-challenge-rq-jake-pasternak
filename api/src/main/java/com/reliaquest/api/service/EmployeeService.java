@@ -54,7 +54,7 @@ public class EmployeeService {
         return null;
     }
 
-    public boolean deleteEmployeeById(String id) throws EmployeeNotFoundException {
+    public boolean deleteEmployeeById(UUID id) throws EmployeeNotFoundException {
         return false;
     }
 }
