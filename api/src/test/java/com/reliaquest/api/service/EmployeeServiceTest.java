@@ -8,10 +8,7 @@ import com.reliaquest.api.model.Employee;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -165,431 +162,436 @@ class EmployeeServiceTest {
     @AfterEach
     void tearDown() {}
 
-    @Test
-    void findAll_whenNoEmployees_returnsEmptyList_andDelegatesToClient() {
-        // Given
-        Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
+    @Nested
+    class FindAllTests {
+        @Test
+        void findAll_whenNoEmployees_returnsEmptyList_andDelegatesToClient() {
+            // Given
+            Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
-        // When
-        List<Employee> result = employeeService.findAll();
+            // When
+            List<Employee> result = employeeService.findAll();
 
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.isEmpty());
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertTrue(result.isEmpty());
 
-        Mockito.verify(client).getAll();
-        Mockito.verifyNoMoreInteractions(client);
+            Mockito.verify(client).getAll();
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void findAll_whenEmployeesExist_returnsList_andDelegatesToClient() {
+            // Given
+            List<Employee> employees = testEmployees.subList(0, 2);
+            Mockito.when(client.getAll()).thenReturn(employees);
+
+            // When
+            List<Employee> result = employeeService.findAll();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(2, result.size());
+
+            Mockito.verify(client).getAll();
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 
-    @Test
-    void findAll_whenEmployeesExist_returnsList_andDelegatesToClient() {
-        // Given
-        List<Employee> employees = testEmployees.subList(0, 2);
-        Mockito.when(client.getAll()).thenReturn(employees);
+    @Nested
+    class SearchTests {
+        @Test
+        void search_whenBlank_throwsValidationException() {
+            // Given
+            String fragment = "";
 
-        // When
-        List<Employee> result = employeeService.findAll();
+            // When
 
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(2, result.size());
+            // Then
+            Assertions.assertThrows(ValidationException.class, () -> employeeService.search(fragment));
+            Mockito.verifyNoInteractions(client);
+        }
 
-        Mockito.verify(client).getAll();
-        Mockito.verifyNoMoreInteractions(client);
+        @Test
+        void search_whenCaseIgnoreCase_returnsMatches() throws ValidationException {
+            // Given
+            List<Employee> result = new ArrayList<>();
+            List<Employee> expected = List.of(testEmployees.get(3), testEmployees.get(12));
+            String fragment = "Rand";
+
+            // When
+            result = employeeService.search(fragment);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(expected.get(0).getName(), result.get(0).getName());
+            Assertions.assertEquals(expected.get(1).getName(), result.get(1).getName());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void search_whenNameHasDiacritics_returnsMatches() throws ValidationException {
+            // Given
+            List<Employee> result = new ArrayList<>();
+            List<Employee> expected = List.of(testEmployees.get(6));
+            String fragment = "Gíno";
+
+            // When
+            result = employeeService.search(fragment);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(expected.get(0).getName(), result.get(0).getName());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void search_whenNoEmployeesExist_returnsEmptyList() throws ValidationException {
+            // Given
+            List<Employee> result;
+            String fragment = "Gíno";
+
+            // When
+            result = employeeService.search(fragment);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertTrue(result.isEmpty());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 
-    @Test
-    void search_whenBlank_throwsValidationException() {
-        // Given
-        String fragment = "";
+    @Nested
+    class FindByIdTests {
+        @Test
+        void findById_whenInvalidUuid_throwsValidationException() {
+            // Given
+            String nonUuid = "somenonUUID1234$%=";
 
-        // When
+            // When
 
-        // Then
-        Assertions.assertThrows(ValidationException.class, () -> employeeService.search(fragment));
-        Mockito.verifyNoInteractions(client);
+            // Then
+            Assertions.assertThrows(ValidationException.class, () -> employeeService.findById(nonUuid));
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findById_whenExists_returnsEmployee() throws EmployeeNotFoundException {
+            // Given
+            String id = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            String name = "Sharda Gibson";
+            Mockito.when(client.getById(Mockito.eq(id))).thenReturn(testEmployees.get(0));
+
+            // When
+            Employee result = employeeService.findById(id);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(id, result.getId());
+            Assertions.assertEquals(name, result.getName());
+
+            Mockito.verify(client.getById(id));
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findById_whenNoEmployeeExists_throwEmployeeNotFoundException() {
+            // Given
+            String id = "99eff840-bc7d-4a3e-b9c8-b46bbcc4104f";
+            Mockito.when(client.getById(Mockito.eq(id))).thenReturn(null);
+
+            // When
+
+            // Then
+            Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.findById(id));
+
+            Mockito.verify(client.getById(id));
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 
-    @Test
-    void search_whenCaseIgnoreCase_returnsMatches() throws ValidationException {
-        // Given
-        List<Employee> result = new ArrayList<>();
-        List<Employee> expected = List.of(testEmployees.get(3), testEmployees.get(12));
-        String fragment = "Rand";
+    @Nested
+    class FindHighestSalaryOfEmployeesTests {
+        @Test
+        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnEmptyList() {
+            // Given
+            Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
-        // When
-        result = employeeService.search(fragment);
+            // When
+            Optional<Integer> result = employeeService.findHighestSalaryOfEmployees();
 
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(expected.get(0).getName(), result.get(0).getName());
-        Assertions.assertEquals(expected.get(1).getName(), result.get(1).getName());
+            // Then
+            Assertions.assertFalse(result.isPresent());
 
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void findHighestSalaryOfEmployees_whenEmployeesWithSalariesExist_returnsHighestSalary() {
+            // Given
+            Mockito.when(client.getAll()).thenReturn(testEmployees);
+
+            // When
+            Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
+
+            // Then
+            Assertions.assertTrue(result.isPresent());
+            Assertions.assertEquals(testEmployees.get(1).getSalary(), result.get());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void findHighestSalaryOfEmployees_whenAllSalariesNull_returnsEmptyOptional() {
+            // Given
+            List<Employee> employeesWithNullSalaries = List.of(new Employee(), new Employee(), new Employee());
+            Mockito.when(client.getAll()).thenReturn(employeesWithNullSalaries);
+
+            // When
+            Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
+
+            // Then
+            Assertions.assertFalse(result.isPresent());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 
-    @Test
-    void search_whenNameHasDiacritics_returnsMatches() throws ValidationException {
-        // Given
-        List<Employee> result = new ArrayList<>();
-        List<Employee> expected = List.of(testEmployees.get(6));
-        String fragment = "Gíno";
+    @Nested
+    class FindTopTenHighestEarningEmployeesTests {
+        @Test
+        void findTopTenHighestEarningEmployees_whenNoEmployeesExist_returnsEmptyList() {
+            // Given
+            Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
-        // When
-        result = employeeService.search(fragment);
+            // When
+            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
 
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(expected.get(0).getName(), result.get(0).getName());
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertTrue(result.isEmpty());
 
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() {
+            // Given
+            List<Employee> employees = testEmployees.subList(0, 5);
+            List<Employee> employeesExpectedOrder =
+                    List.of(employees.get(1), employees.get(2), employees.get(0), employees.get(3), employees.get(4));
+            Mockito.when(client.getAll()).thenReturn(employees);
+
+            // When
+            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(5, result.size());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void findTopTenHighestEarningEmployees_whenSalariesTie_sortsBySalaryDescThenNameAscThenIdAsc() {
+            // Given
+            List<Employee> employeesExpectedOrder = List.of(
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0));
+            Mockito.when(client.getAll()).thenReturn(testEmployees);
+
+            // When
+            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(10, result.size());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void findTopTenHighestEarningEmployees_whenSalariesTieAtPosition10_useNameAsc() {
+            // Given
+            List<Employee> employeesExpectedOrder = List.of(
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0),
+                    testEmployees.get(0));
+            Mockito.when(client.getAll()).thenReturn(testEmployees);
+
+            // When
+            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(10, result.size());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
+            Assertions.assertEquals(
+                    employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
+
+            Mockito.verify(client.getAll());
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 
-    @Test
-    void search_whenNoEmployeesExist_returnsEmptyList() throws ValidationException {
-        // Given
-        List<Employee> result;
-        String fragment = "Gíno";
+    @Nested
+    class CreateEmployeeTests {
+        @Test
+        void createEmployee_whenInvalidInput_throwsValidationException() {
+            // Given
+            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput();
 
-        // When
-        result = employeeService.search(fragment);
+            // When
 
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.isEmpty());
+            // Then
+            Assertions.assertThrows(ValidationException.class, () -> employeeService.createEmployee(employeeToCreate));
 
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void createEmployee_whenValidInput_returnsCreatedEmployee_delegatesToClient() throws ValidationException {
+            // Given
+            String name = "";
+            int salary = 0;
+            int age = 0;
+            String title = "";
+            String email = "";
+            String id = ""; // TODO
+            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput();
+            employeeToCreate.setName(name);
+            employeeToCreate.setSalary(salary);
+            employeeToCreate.setAge(age);
+            employeeToCreate.setTitle(title);
+
+            Employee employeeCreated =
+                    new Employee(id, name, salary, age, title, email); // Adds ID, no email since it's generated
+            Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
+
+            // When
+            Employee result = employeeService.createEmployee(employeeToCreate);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertNotNull(result);
+
+            Mockito.verify(client.create(employeeToCreate));
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 
-    @Test
-    void findById_whenInvalidUuid_throwsValidationException() {
-        // Given
-        String nonUuid = "somenonUUID1234$%=";
+    @Nested
+    class DeleteEmployeeTests {
+        @Test
+        void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
+            // Given
+            String id = "89eff840-bc7d-4a3e-b9c8-b46bbcc41043"; // Does not exist
+            Mockito.when(client.getById(id)).thenReturn(null);
 
-        // When
+            // When
+            Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
 
-        // Then
-        Assertions.assertThrows(ValidationException.class, () -> employeeService.findById(nonUuid));
-        Mockito.verifyNoInteractions(client);
-    }
+            // Then
+            Mockito.verify(client.getById(id));
+            Mockito.verifyNoMoreInteractions(client);
+        }
 
-    @Test
-    void findById_whenExists_returnsEmployee() throws EmployeeNotFoundException {
-        // Given
-        String id = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
-        String name = "Sharda Gibson";
-        Mockito.when(client.getById(Mockito.eq(id))).thenReturn(testEmployees.get(0));
+        @Test
+        void deleteEmployeeById_whenNameResolves_deletesByName_returnsTrue() throws EmployeeNotFoundException {
+            // Given
+            String idToDelete = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            String nameToDelete = "Sharda Gibson";
+            Mockito.when(client.getById(idToDelete)).thenReturn(testEmployees.get(0));
+            Mockito.when(client.deleteByName(nameToDelete)).thenReturn(true);
 
-        // When
-        Employee result = employeeService.findById(id);
+            // When
+            boolean result = employeeService.deleteEmployeeById(idToDelete);
 
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertEquals(id, result.getId());
-        Assertions.assertEquals(name, result.getName());
+            // Then
+            Assertions.assertTrue(result);
 
-        Mockito.verify(client.getById(id));
-        Mockito.verifyNoInteractions(client);
-    }
-
-    @Test
-    void findById_whenNoEmployeeExists_throwEmployeeNotFoundException() {
-        // Given
-        String id = "99eff840-bc7d-4a3e-b9c8-b46bbcc4104f";
-        Mockito.when(client.getById(Mockito.eq(id))).thenReturn(null);
-
-        // When
-
-        // Then
-        Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.findById(id));
-
-        Mockito.verify(client.getById(id));
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnEmptyList() {
-        // Given
-        Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
-
-        // When
-        Optional<Integer> result = employeeService.findHighestSalaryOfEmployees();
-
-        // Then
-        Assertions.assertFalse(result.isPresent());
-
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void findHighestSalaryOfEmployees_whenEmployeesWithSalariesExist_returnsHighestSalary() {
-        // Given
-        Mockito.when(client.getAll()).thenReturn(testEmployees);
-
-        // When
-        Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
-
-        // Then
-        Assertions.assertTrue(result.isPresent());
-        Assertions.assertEquals(testEmployees.get(1).getSalary(), result.get());
-
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    //    @Test
-    //    void findHighestSalaryOfEmployees_whenNullSalariesExist_returnsSalaryIgnoringNulls() {
-    //        // Given
-    //        Mockito.when(client.getAll()).thenReturn(testEmployees);
-    //
-    //        // When
-    //        Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
-    //
-    //        // Then
-    //        Assertions.assertTrue(result.isPresent());
-    //        Assertions.assertEquals(testEmployees.get(1).getSalary(),  result.get());
-    //
-    //        Mockito.verify(client.getAll());
-    //        Mockito.verifyNoMoreInteractions(client);
-    //    }
-
-    @Test
-    void findHighestSalaryOfEmployees_whenAllSalariesNull_returnsEmptyOptional() {
-        // Given
-        List<Employee> employeesWithNullSalaries = List.of(new Employee(), new Employee(), new Employee());
-        Mockito.when(client.getAll()).thenReturn(employeesWithNullSalaries);
-
-        // When
-        Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
-
-        // Then
-        Assertions.assertFalse(result.isPresent());
-
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void findTopTenHighestEarningEmployees_whenNoEmployeesExist_returnsEmptyList() {
-        // Given
-        Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
-
-        // When
-        List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
-
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertTrue(result.isEmpty());
-
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() {
-        // Given
-        List<Employee> employees = testEmployees.subList(0, 5);
-        List<Employee> employeesExpectedOrder =
-                List.of(employees.get(1), employees.get(2), employees.get(0), employees.get(3), employees.get(4));
-        Mockito.when(client.getAll()).thenReturn(employees);
-
-        // When
-        List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
-
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(5, result.size());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
-
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void findTopTenHighestEarningEmployees_whenSalariesTie_sortsBySalaryDescThenNameAscThenIdAsc() {
-        // Given
-        List<Employee> employeesExpectedOrder = List.of(
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0));
-        Mockito.when(client.getAll()).thenReturn(testEmployees);
-
-        // When
-        List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
-
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(10, result.size());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
-
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void findTopTenHighestEarningEmployees_whenSalariesTieAtPosition10_useNameAsc() {
-        // Given
-        List<Employee> employeesExpectedOrder = List.of(
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0),
-                testEmployees.get(0));
-        Mockito.when(client.getAll()).thenReturn(testEmployees);
-
-        // When
-        List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
-
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertFalse(result.isEmpty());
-        Assertions.assertEquals(10, result.size());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
-        Assertions.assertEquals(
-                employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
-
-        Mockito.verify(client.getAll());
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void createEmployee_whenInvalidInput_throwsValidationException() {
-        // Given
-        CreateEmployeeInput employeeToCreate = new CreateEmployeeInput();
-
-        // When
-
-        // Then
-        Assertions.assertThrows(ValidationException.class, () -> employeeService.createEmployee(employeeToCreate));
-
-        Mockito.verifyNoInteractions(client);
-    }
-
-    @Test
-    void createEmployee_whenValidInput_returnsCreatedEmployee_delegatesToClient() throws ValidationException {
-        // Given
-        String name = "";
-        int salary = 0;
-        int age = 0;
-        String title = "";
-        String email = "";
-        String id = ""; // TODO
-        CreateEmployeeInput employeeToCreate = new CreateEmployeeInput();
-        employeeToCreate.setName(name);
-        employeeToCreate.setSalary(salary);
-        employeeToCreate.setAge(age);
-        employeeToCreate.setTitle(title);
-
-        Employee employeeCreated =
-                new Employee(id, name, salary, age, title, email); // Adds ID, no email since it's generated
-        Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
-
-        // When
-        Employee result = employeeService.createEmployee(employeeToCreate);
-
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertNotNull(result);
-
-        Mockito.verify(client.create(employeeToCreate));
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() throws EmployeeNotFoundException {
-        // Given
-        String id = "89eff840-bc7d-4a3e-b9c8-b46bbcc41043"; // Does not exist
-        Mockito.when(client.getById(id)).thenReturn(null);
-
-        // When
-        Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
-
-        // Then
-        Mockito.verify(client.getById(id));
-        Mockito.verifyNoMoreInteractions(client);
-    }
-
-    @Test
-    void deleteEmployeeById_whenNameResolves_deletesByName_returnsTrue() throws EmployeeNotFoundException {
-        // Given
-        String idToDelete = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
-        String nameToDelete = "Sharda Gibson";
-        Mockito.when(client.getById(idToDelete)).thenReturn(testEmployees.get(0));
-        Mockito.when(client.deleteByName(nameToDelete)).thenReturn(true);
-
-        // When
-        boolean result = employeeService.deleteEmployeeById(idToDelete);
-
-        // Then
-        Assertions.assertTrue(result);
-
-        Mockito.verify(client.getById(idToDelete));
-        Mockito.verify(client.deleteByName(nameToDelete));
-        Mockito.verifyNoMoreInteractions(client);
+            Mockito.verify(client.getById(idToDelete));
+            Mockito.verify(client.deleteByName(nameToDelete));
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 }
