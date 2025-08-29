@@ -1,5 +1,6 @@
 package com.reliaquest.api.service;
 
+import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.exception.ValidationException;
 import com.reliaquest.api.gateway.EmployeeClient;
@@ -193,6 +194,19 @@ class EmployeeServiceTest {
             Assertions.assertNotNull(result);
             Assertions.assertEquals(2, result.size());
 
+            Mockito.verify(client).getAll();
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void findAll_whenClientRateLimited_throwsDownstreamUnavailableException() throws DownstreamUnavailableException {
+            // Given
+            Mockito.when(client.getAll()).thenThrow(new DownstreamUnavailableException());
+
+            // When
+            Assertions.assertThrows(DownstreamUnavailableException.class, () -> employeeService.findAll());
+
+            // Then
             Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
