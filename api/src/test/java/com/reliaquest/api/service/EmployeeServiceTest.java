@@ -321,7 +321,7 @@ class EmployeeServiceTest {
     @Nested
     class FindHighestSalaryOfEmployeesTests {
         @Test
-        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnEmptyList() {
+        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnsEmptyOptional() {
             // Given
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
