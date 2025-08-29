@@ -602,7 +602,7 @@ class EmployeeServiceTest {
             Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
 
             // Then
-            Mockito.verify(client.getById(id));
+            Mockito.verify(client).getById(id);
             Mockito.verifyNoMoreInteractions(client);
         }
 
@@ -620,8 +620,8 @@ class EmployeeServiceTest {
             // Then
             Assertions.assertTrue(result);
 
-            Mockito.verify(client.getById(idToDelete));
-            Mockito.verify(client.deleteByName(nameToDelete));
+            Mockito.verify(client).getById(idToDelete);
+            Mockito.verify(client).deleteByName(nameToDelete);
             Mockito.verifyNoMoreInteractions(client);
         }
     }
