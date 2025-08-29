@@ -557,22 +557,18 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void createEmployee_whenValidInput_returnsCreatedEmployee_delegatesToClient() throws ValidationException {
+        void createEmployee_whenValidInput_returnsCreatedEmployee_delegatesToClient() {
             // Given
-            String name = "";
-            int salary = 0;
-            int age = 0;
-            String title = "";
-            String email = "";
-            String id = ""; // TODO
-            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput();
-            employeeToCreate.setName(name);
-            employeeToCreate.setSalary(salary);
-            employeeToCreate.setAge(age);
-            employeeToCreate.setTitle(title);
+            String name = "Test McTest";
+            int salary = 100;
+            int age = 28;
+            String title = "Lead Tester";
+            String email = "testlead@company.com";
+            UUID id = UUID.randomUUID(); // TODO
+            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput(name, salary, age, title);
 
             Employee employeeCreated =
-                    new Employee(id, name, salary, age, title, email); // Adds ID, no email since it's generated
+                    new Employee(id, name, salary, age, title, email);
             Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
 
             // When
@@ -580,9 +576,16 @@ class EmployeeServiceTest {
 
             // Then
             Assertions.assertNotNull(result);
-            Assertions.assertNotNull(result);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals(name, result.getName()),
+                    () -> Assertions.assertEquals(salary, result.getSalary()),
+                    () -> Assertions.assertEquals(age, result.getAge()),
+                    () -> Assertions.assertEquals(title, result.getTitle()),
+                    () -> Assertions.assertEquals(id, result.getId()),
+                    () -> Assertions.assertEquals(email, result.getEmail())
+            );
 
-            Mockito.verify(client.create(employeeToCreate));
+            Mockito.verify(client).create(employeeToCreate);
             Mockito.verifyNoMoreInteractions(client);
         }
     }
