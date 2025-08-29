@@ -652,7 +652,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void deleteEmployeeById_whenNameResolves_deletesByName_returnsTrue() throws EmployeeNotFoundException {
+        void deleteEmployeeById_whenNameResolves_deletesByName_returnsEmployeeName() throws EmployeeNotFoundException {
             // Given
             UUID idToDelete = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042");
             String nameToDelete = "Sharda Gibson";
