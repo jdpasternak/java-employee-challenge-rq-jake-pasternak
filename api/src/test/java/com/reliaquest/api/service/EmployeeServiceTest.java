@@ -6,10 +6,8 @@ import com.reliaquest.api.exception.ValidationException;
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+
+import java.util.*;
 
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.ConstraintViolationException;
@@ -362,7 +360,7 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
             // When
-            Optional<Integer> result = employeeService.findHighestSalaryOfEmployees();
+            OptionalInt result = employeeService.findHighestSalaryOfEmployees();
 
             // Then
             Assertions.assertFalse(result.isPresent());
@@ -377,11 +375,11 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(testEmployees);
 
             // When
-            Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
+            OptionalInt result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
 
             // Then
             Assertions.assertTrue(result.isPresent());
-            Assertions.assertEquals(testEmployees.get(1).getSalary(), result.get());
+            Assertions.assertEquals(testEmployees.get(1).getSalary(), result.getAsInt());
 
             Mockito.verify(client.getAll());
             Mockito.verifyNoMoreInteractions(client);
@@ -394,7 +392,7 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(employeesWithNullSalaries);
 
             // When
-            Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
+            OptionalInt result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
 
             // Then
             Assertions.assertFalse(result.isPresent());
