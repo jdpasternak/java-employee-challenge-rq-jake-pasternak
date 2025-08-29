@@ -17,6 +17,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -213,7 +216,13 @@ class EmployeeServiceTest {
     }
 
     @Nested
+    @SpringBootTest
     class SearchTests {
+        @MockBean
+        EmployeeClient client;
+
+        @Autowired
+        EmployeeService employeeService;
         @Test
         void search_whenBlank_throwsValidationException() {
             // Given
