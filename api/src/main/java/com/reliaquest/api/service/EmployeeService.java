@@ -55,7 +55,7 @@ public class EmployeeService {
                 .toList();
     }
 
-    public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) throws ValidationException {
+    public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) {
         return client.create(employeeInput);
     }
 
