@@ -27,7 +27,7 @@ public class EmployeeService {
         return client.getAll();
     }
 
-    public List<Employee> search(@Valid SearchInput searchInput) throws DownstreamUnavailableException {
+    public List<Employee> search(@Valid SearchInput searchInput) {
         List<Employee> employees = client.getAll();
         String normalizedSearchString = searchInput.getSearchString().toLowerCase(Locale.ROOT);
         return employees.stream().filter(employee ->
