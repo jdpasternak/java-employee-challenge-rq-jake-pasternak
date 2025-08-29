@@ -1,5 +1,6 @@
 package com.reliaquest.api.gateway;
 
+import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +17,7 @@ public class EmployeeClient {
         return null;
     }
 
-    public Employee create(Employee in) {
+    public Employee create(CreateEmployeeInput in) {
         return null;
     }
 

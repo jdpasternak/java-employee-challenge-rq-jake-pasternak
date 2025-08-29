@@ -3,6 +3,7 @@ package com.reliaquest.api.service;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.exception.ValidationException;
 import com.reliaquest.api.gateway.EmployeeClient;
+import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class EmployeeService {
         return null;
     }
 
-    public Employee createEmployee(Employee employeeInput) throws ValidationException {
+    public Employee createEmployee(CreateEmployeeInput employeeInput) throws ValidationException {
         return null;
     }
 
