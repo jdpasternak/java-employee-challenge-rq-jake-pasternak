@@ -2,8 +2,10 @@ package com.reliaquest.api.gateway;
 
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-import java.util.List;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.UUID;
 
 @Component
 public class EmployeeClient {
@@ -12,7 +14,7 @@ public class EmployeeClient {
         return null;
     }
 
-    public Employee getById(String id) {
+    public Employee getById(UUID id) {
         return null;
     }
 
