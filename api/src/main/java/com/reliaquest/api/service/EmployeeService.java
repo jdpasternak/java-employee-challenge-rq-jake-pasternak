@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
-import java.util.List;
-import java.util.Locale;
-import java.util.OptionalInt;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @Validated
@@ -54,7 +51,10 @@ public class EmployeeService {
         return client.create(employeeInput);
     }
 
-    public boolean deleteEmployeeById(UUID id) throws EmployeeNotFoundException {
-        return false;
+    public String deleteEmployeeById(@NotNull UUID id) throws EmployeeNotFoundException {
+        Employee employeeFound = client.getById(id);
+        String name = employeeFound.getName();
+        client.deleteByName(name);
+        return name;
     }
 }
