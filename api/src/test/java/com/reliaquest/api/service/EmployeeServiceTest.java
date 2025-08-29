@@ -350,7 +350,7 @@ class EmployeeServiceTest {
     @Nested
     class FindHighestSalaryOfEmployeesTests {
         @Test
-        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnsEmptyOptional() {
+        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnsEmptyOptional() throws DownstreamUnavailableException {
             // Given
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
@@ -365,7 +365,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findHighestSalaryOfEmployees_whenEmployeesWithSalariesExist_returnsHighestSalary() {
+        void findHighestSalaryOfEmployees_whenEmployeesWithSalariesExist_returnsHighestSalary() throws DownstreamUnavailableException {
             // Given
             Mockito.when(client.getAll()).thenReturn(testEmployees);
 
@@ -381,7 +381,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findHighestSalaryOfEmployees_whenAllSalariesNull_returnsEmptyOptional() {
+        void findHighestSalaryOfEmployees_whenAllSalariesNull_returnsEmptyOptional() throws DownstreamUnavailableException {
             // Given
             List<Employee> employeesWithNullSalaries = List.of(new Employee(), new Employee(), new Employee());
             Mockito.when(client.getAll()).thenReturn(employeesWithNullSalaries);
@@ -400,7 +400,7 @@ class EmployeeServiceTest {
     @Nested
     class FindTopTenHighestEarningEmployeesTests {
         @Test
-        void findTopTenHighestEarningEmployees_whenNoEmployeesExist_returnsEmptyList() {
+        void findTopTenHighestEarningEmployees_whenNoEmployeesExist_returnsEmptyList() throws DownstreamUnavailableException {
             // Given
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
@@ -416,7 +416,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() {
+        void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() throws DownstreamUnavailableException {
             // Given
             List<Employee> employees = testEmployees.subList(0, 5);
             List<Employee> employeesExpectedOrder =
@@ -446,7 +446,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findTopTenHighestEarningEmployees_whenSalariesTie_sortsBySalaryDescThenNameAscThenIdAsc() {
+        void findTopTenHighestEarningEmployees_whenSalariesTie_sortsBySalaryDescThenNameAscThenIdAsc() throws DownstreamUnavailableException {
             // Given
             List<Employee> employeesExpectedOrder = List.of(
                     testEmployees.get(0),
@@ -494,7 +494,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findTopTenHighestEarningEmployees_whenSalariesTieAtPosition10_useNameAsc() {
+        void findTopTenHighestEarningEmployees_whenSalariesTieAtPosition10_useNameAsc() throws DownstreamUnavailableException {
             // Given
             List<Employee> employeesExpectedOrder = List.of(
                     testEmployees.get(0),
