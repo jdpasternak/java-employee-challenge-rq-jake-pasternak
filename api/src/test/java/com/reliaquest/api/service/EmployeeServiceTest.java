@@ -9,6 +9,9 @@ import com.reliaquest.api.model.Employee;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+
+import com.reliaquest.api.model.SearchInput;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -224,26 +227,27 @@ class EmployeeServiceTest {
         @Autowired
         EmployeeService employeeService;
         @Test
-        void search_whenBlank_throwsValidationException() {
+        void search_whenBlank_throwsConstraintViolationException() {
             // Given
-            String fragment = "";
+            SearchInput searchInput = new SearchInput(" ");
 
             // When
 
             // Then
-            Assertions.assertThrows(ValidationException.class, () -> employeeService.search(fragment));
+            Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.search(searchInput));
             Mockito.verifyNoInteractions(client);
         }
 
         @Test
-        void search_whenCaseIgnoreCase_returnsMatches() throws ValidationException {
+        void search_whenCaseIgnoreCase_returnsMatches() throws DownstreamUnavailableException {
             // Given
             List<Employee> result = new ArrayList<>();
             List<Employee> expected = List.of(testEmployees.get(3), testEmployees.get(12));
-            String fragment = "Rand";
+            SearchInput searchInput = new SearchInput("Rand");
+            Mockito.when(client.getAll()).thenReturn(expected);
 
             // When
-            result = employeeService.search(fragment);
+            result = employeeService.search(searchInput);
 
             // Then
             Assertions.assertNotNull(result);
@@ -251,19 +255,19 @@ class EmployeeServiceTest {
             Assertions.assertEquals(expected.get(0).getName(), result.get(0).getName());
             Assertions.assertEquals(expected.get(1).getName(), result.get(1).getName());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
 
         @Test
-        void search_whenNameHasDiacritics_returnsMatches() throws ValidationException {
+        void search_whenNameHasDiacritics_returnsMatches() throws ValidationException, DownstreamUnavailableException {
             // Given
             List<Employee> result = new ArrayList<>();
             List<Employee> expected = List.of(testEmployees.get(6));
-            String fragment = "Gíno";
+            SearchInput searchInput = new SearchInput("Gíno");
 
             // When
-            result = employeeService.search(fragment);
+            result = employeeService.search(searchInput);
 
             // Then
             Assertions.assertNotNull(result);
@@ -275,13 +279,13 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void search_whenNoEmployeesExist_returnsEmptyList() throws ValidationException {
+        void search_whenNoEmployeesExist_returnsEmptyList() throws ValidationException, DownstreamUnavailableException {
             // Given
             List<Employee> result;
-            String fragment = "Gíno";
+            SearchInput searchInput = new SearchInput("Gíno");
 
             // When
-            result = employeeService.search(fragment);
+            result = employeeService.search(searchInput);
 
             // Then
             Assertions.assertNotNull(result);
