@@ -9,6 +9,7 @@ import com.reliaquest.api.model.Employee;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.ConstraintViolationException;
@@ -307,14 +308,14 @@ class EmployeeServiceTest {
         @Autowired
         EmployeeService employeeService;
         @Test
-        void findById_whenInvalidUuid_throwsValidationException() {
+        void findById_whenUuidIsNull_throwsConstraintViolationException() {
             // Given
-            String nonUuid = "somenonUUID1234$%=";
+            UUID nonUuid = null;
 
             // When
 
             // Then
-            Assertions.assertThrows(ValidationException.class, () -> employeeService.findById(nonUuid));
+            Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.findById(nonUuid));
             Mockito.verifyNoInteractions(client);
         }
 
