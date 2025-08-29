@@ -399,7 +399,7 @@ class EmployeeServiceTest {
             Assertions.assertNotNull(result);
             Assertions.assertTrue(result.isEmpty());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
 
@@ -429,7 +429,7 @@ class EmployeeServiceTest {
             Assertions.assertEquals(
                     employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
 
@@ -477,7 +477,7 @@ class EmployeeServiceTest {
             Assertions.assertEquals(
                     employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
 
@@ -525,7 +525,7 @@ class EmployeeServiceTest {
             Assertions.assertEquals(
                     employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
     }
