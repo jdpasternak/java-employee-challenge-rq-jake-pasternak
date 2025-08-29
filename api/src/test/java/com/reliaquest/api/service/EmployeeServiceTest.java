@@ -596,7 +596,7 @@ class EmployeeServiceTest {
         void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
             // Given
             UUID id = UUID.fromString("89eff840-bc7d-4a3e-b9c8-b46bbcc41043"); // Does not exist
-            Mockito.when(client.getById(id)).thenReturn(null);
+            Mockito.when(client.getById(id)).thenThrow(new EmployeeNotFoundException());
 
             // When
             Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
