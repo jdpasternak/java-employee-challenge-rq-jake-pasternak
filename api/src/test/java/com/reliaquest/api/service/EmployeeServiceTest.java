@@ -279,10 +279,11 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void search_whenNoEmployeesExist_returnsEmptyList() throws ValidationException, DownstreamUnavailableException {
+        void search_whenNoEmployeesExist_returnsEmptyList() throws DownstreamUnavailableException {
             // Given
             List<Employee> result;
             SearchInput searchInput = new SearchInput("Gíno");
+            Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
             // When
             result = employeeService.search(searchInput);
@@ -291,7 +292,7 @@ class EmployeeServiceTest {
             Assertions.assertNotNull(result);
             Assertions.assertTrue(result.isEmpty());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
     }
