@@ -45,7 +45,10 @@ public class EmployeeService {
 
     public List<Employee> findTopTenHighestEarningEmployees() {
         List<Employee> employees = client.getAll();
-        return employees;
+        return employees.stream()
+                .sorted(EmployeeComparators.BY_SALARY_DESC_NAME_ASC_ID_ASC)
+                .limit(10)
+                .toList();
     }
 
     public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) throws ValidationException {
