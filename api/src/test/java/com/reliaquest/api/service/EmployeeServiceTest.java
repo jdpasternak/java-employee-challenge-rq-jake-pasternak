@@ -633,10 +633,11 @@ class EmployeeServiceTest {
             Mockito.when(client.deleteByName(nameToDelete)).thenReturn(true);
 
             // When
-            boolean result = employeeService.deleteEmployeeById(idToDelete);
+            String result = employeeService.deleteEmployeeById(idToDelete);
 
             // Then
-            Assertions.assertTrue(result);
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(nameToDelete, result);
 
             Mockito.verify(client).getById(idToDelete);
             Mockito.verify(client).deleteByName(nameToDelete);
