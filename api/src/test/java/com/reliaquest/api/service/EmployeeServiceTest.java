@@ -542,12 +542,16 @@ class EmployeeServiceTest {
         @Test
         void createEmployee_whenInvalidInput_throwsValidationException() {
             // Given
-            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput();
+            CreateEmployeeInput employeeToCreate1 = new CreateEmployeeInput(null, -1, -2, null);
+            CreateEmployeeInput employeeToCreate2 = new CreateEmployeeInput(" ", -1, -2, " ");
 
             // When
 
             // Then
-            Assertions.assertThrows(ValidationException.class, () -> employeeService.createEmployee(employeeToCreate));
+            Assertions.assertAll(
+                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.createEmployee(employeeToCreate1)),
+                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.createEmployee(employeeToCreate2))
+            );
 
             Mockito.verifyNoInteractions(client);
         }
