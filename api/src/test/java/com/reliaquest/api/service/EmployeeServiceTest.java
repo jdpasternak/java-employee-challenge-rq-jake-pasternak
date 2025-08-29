@@ -12,7 +12,6 @@ import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,8 +24,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class EmployeeServiceTest {
-
-    @InjectMocks
     EmployeeService employeeService;
 
     @Mock
@@ -36,6 +33,7 @@ class EmployeeServiceTest {
 
     @BeforeEach
     void setUp() {
+        employeeService = new EmployeeService(client);
         Employee nullSalaryEmployee = new Employee();
         Employee duplicateSalaryEmployee = new Employee(
                 UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41043"),

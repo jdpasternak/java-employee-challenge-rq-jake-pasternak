@@ -18,8 +18,11 @@ import java.util.*;
 @Validated
 public class EmployeeService {
 
-    @Autowired
-    EmployeeClient client;
+    private final EmployeeClient client;
+
+    public EmployeeService(EmployeeClient client) {
+        this.client = client;
+    }
 
     public List<Employee> findAll() {
         return client.getAll();
