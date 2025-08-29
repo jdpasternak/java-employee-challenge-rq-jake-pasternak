@@ -540,7 +540,7 @@ class EmployeeServiceTest {
         @Autowired
         EmployeeService employeeService;
         @Test
-        void createEmployee_whenInvalidInput_throwsValidationException() {
+        void createEmployee_whenInvalidInput_throwsConstraintViolationException() {
             // Given
             CreateEmployeeInput employeeToCreate1 = new CreateEmployeeInput(null, -1, -2, null);
             CreateEmployeeInput employeeToCreate2 = new CreateEmployeeInput(" ", -1, -2, " ");
