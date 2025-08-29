@@ -7,13 +7,13 @@ import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Locale;
+import java.util.OptionalInt;
+import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
-
-import java.util.*;
 
 @Service
 @Validated
@@ -32,9 +32,8 @@ public class EmployeeService {
     public List<Employee> search(@Valid SearchInput searchInput) {
         List<Employee> employees = client.getAll();
         String normalizedSearchString = searchInput.getSearchString().toLowerCase(Locale.ROOT);
-        return employees.stream().filter(employee ->
-                        employee.getName().toLowerCase(Locale.ROOT)
-                                .contains(normalizedSearchString))
+        return employees.stream()
+                .filter(employee -> employee.getName().toLowerCase(Locale.ROOT).contains(normalizedSearchString))
                 .toList();
     }
 

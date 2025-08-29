@@ -5,11 +5,9 @@ import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-
-import java.util.*;
-
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.ConstraintViolationException;
+import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -201,7 +199,8 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findAll_whenClientRateLimited_throwsDownstreamUnavailableException() throws DownstreamUnavailableException {
+        void findAll_whenClientRateLimited_throwsDownstreamUnavailableException()
+                throws DownstreamUnavailableException {
             // Given
             Mockito.when(client.getAll()).thenThrow(new DownstreamUnavailableException());
 
@@ -222,6 +221,7 @@ class EmployeeServiceTest {
 
         @Autowired
         EmployeeService employeeService;
+
         @Test
         void search_whenBlank_throwsConstraintViolationException() {
             // Given
@@ -302,6 +302,7 @@ class EmployeeServiceTest {
 
         @Autowired
         EmployeeService employeeService;
+
         @Test
         void findById_whenUuidIsNull_throwsConstraintViolationException() {
             // Given
@@ -564,6 +565,7 @@ class EmployeeServiceTest {
 
         @Autowired
         EmployeeService employeeService;
+
         @Test
         void createEmployee_whenInvalidInput_throwsConstraintViolationException() {
             // Given
@@ -574,9 +576,12 @@ class EmployeeServiceTest {
 
             // Then
             Assertions.assertAll(
-                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.createEmployee(employeeToCreate1)),
-                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.createEmployee(employeeToCreate2))
-            );
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class,
+                            () -> employeeService.createEmployee(employeeToCreate1)),
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class,
+                            () -> employeeService.createEmployee(employeeToCreate2)));
 
             Mockito.verifyNoInteractions(client);
         }
@@ -592,8 +597,7 @@ class EmployeeServiceTest {
             UUID id = UUID.randomUUID(); // TODO
             CreateEmployeeInput employeeToCreate = new CreateEmployeeInput(name, salary, age, title);
 
-            Employee employeeCreated =
-                    new Employee(id, name, salary, age, title, email);
+            Employee employeeCreated = new Employee(id, name, salary, age, title, email);
             Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
 
             // When
@@ -607,8 +611,7 @@ class EmployeeServiceTest {
                     () -> Assertions.assertEquals(age, result.getAge()),
                     () -> Assertions.assertEquals(title, result.getTitle()),
                     () -> Assertions.assertEquals(id, result.getId()),
-                    () -> Assertions.assertEquals(email, result.getEmail())
-            );
+                    () -> Assertions.assertEquals(email, result.getEmail()));
 
             Mockito.verify(client).create(employeeToCreate);
             Mockito.verifyNoMoreInteractions(client);
@@ -623,6 +626,7 @@ class EmployeeServiceTest {
 
         @Autowired
         EmployeeService employeeService;
+
         @Test
         void deleteEmployeeById_whenIdInputIsNull_throwsConstraintViolationException() {
             // Given
