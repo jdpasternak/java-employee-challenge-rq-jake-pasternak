@@ -342,14 +342,14 @@ class EmployeeServiceTest {
         void findById_whenNoEmployeeExists_throwEmployeeNotFoundException() {
             // Given
             UUID id = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc4104f");
-            Mockito.when(client.getById(Mockito.eq(id))).thenReturn(null);
+            Mockito.when(client.getById(Mockito.eq(id))).thenThrow(new EmployeeNotFoundException());
 
             // When
 
             // Then
             Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.findById(id));
 
-            Mockito.verify(client.getById(id));
+            Mockito.verify(client).getById(id);
             Mockito.verifyNoMoreInteractions(client);
         }
     }
