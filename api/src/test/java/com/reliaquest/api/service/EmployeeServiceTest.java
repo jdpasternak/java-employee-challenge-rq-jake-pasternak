@@ -166,7 +166,7 @@ class EmployeeServiceTest {
     @Nested
     class FindAllTests {
         @Test
-        void findAll_whenNoEmployees_returnsEmptyList_andDelegatesToClient() {
+        void findAll_whenNoEmployees_returnsEmptyList_andDelegatesToClient() throws DownstreamUnavailableException {
             // Given
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
@@ -182,7 +182,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findAll_whenEmployeesExist_returnsList_andDelegatesToClient() {
+        void findAll_whenEmployeesExist_returnsList_andDelegatesToClient() throws DownstreamUnavailableException {
             // Given
             List<Employee> employees = testEmployees.subList(0, 2);
             Mockito.when(client.getAll()).thenReturn(employees);
