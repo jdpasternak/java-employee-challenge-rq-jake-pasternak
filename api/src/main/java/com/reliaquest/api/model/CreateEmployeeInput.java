@@ -13,7 +13,8 @@ public class CreateEmployeeInput {
     @Min(1)
     private int salary;
 
-    @Min(16) @Max(75)
+    @Min(16)
+    @Max(75)
     private int age;
 
     @NotBlank

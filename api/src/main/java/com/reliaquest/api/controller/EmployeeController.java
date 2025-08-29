@@ -2,11 +2,10 @@ package com.reliaquest.api.controller;
 
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.Response;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/employee")

@@ -5,6 +5,9 @@ import com.reliaquest.api.exception.ValidationException;
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,12 +19,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.util.Assert;
-
-import javax.swing.text.html.Option;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
@@ -38,47 +35,135 @@ class EmployeeServiceTest {
     @BeforeEach
     void setUp() {
         Employee nullSalaryEmployee = new Employee();
-        Employee duplicateSalaryEmployee = new Employee("99eff840-bc7d-4a3e-b9c8-b46bbcc41043", "Shardo Gibsona", 378048, 32, "Legacy Accounting Executor", "sup-ex@company.com");
-        Employee duplicate10thSalaryEmployee = new Employee("1500c807-a43a-4d73-9862-a3c4b9331d78", "Andrio Schmidt PhD", 275740, 47, "Consulting Facilition Manager", "lotstrung@company.com");
+        Employee duplicateSalaryEmployee = new Employee(
+                "99eff840-bc7d-4a3e-b9c8-b46bbcc41043",
+                "Shardo Gibsona",
+                378048,
+                32,
+                "Legacy Accounting Executor",
+                "sup-ex@company.com");
+        Employee duplicate10thSalaryEmployee = new Employee(
+                "1500c807-a43a-4d73-9862-a3c4b9331d78",
+                "Andrio Schmidt PhD",
+                275740,
+                47,
+                "Consulting Facilition Manager",
+                "lotstrung@company.com");
         testEmployees = List.of(
                 // 0 - sal_6(tie), sub_sal_3
-                new Employee("99eff840-bc7d-4a3e-b9c8-b46bbcc41042", "Sharda Gibson", 378048, 31, "Legacy Accounting Executive", "sub-ex@company.com"),
+                new Employee(
+                        "99eff840-bc7d-4a3e-b9c8-b46bbcc41042",
+                        "Sharda Gibson",
+                        378048,
+                        31,
+                        "Legacy Accounting Executive",
+                        "sub-ex@company.com"),
                 // 1 - sal_10, sub_sal_5, Highest Salary of sublist(0,5) and overall.
-                new Employee("f5651c6b-e001-46ed-b455-6b4613825de3", "Vena Dickens IV", 490233, 45, "Forward Healthcare Strategist", "blade_runnerz@company.com"),
+                new Employee(
+                        "f5651c6b-e001-46ed-b455-6b4613825de3",
+                        "Vena Dickens IV",
+                        490233,
+                        45,
+                        "Forward Healthcare Strategist",
+                        "blade_runnerz@company.com"),
                 // 2 - sal_9, sub_sal_4
-                new Employee("a552a9a2-44a6-4ff4-80ea-28747a70e661", "Natalia Wyman", 433856, 56, "International Analyst", "cardguard@company.com"),
+                new Employee(
+                        "a552a9a2-44a6-4ff4-80ea-28747a70e661",
+                        "Natalia Wyman",
+                        433856,
+                        56,
+                        "International Analyst",
+                        "cardguard@company.com"),
                 // 3 - sal_4, sub_sal_2
-                new Employee("824af032-38bc-444a-8baa-46e41e24ae4e", "Randall Batz", 367484, 28, "IT Architect", "veribet@company.com"),
+                new Employee(
+                        "824af032-38bc-444a-8baa-46e41e24ae4e",
+                        "Randall Batz",
+                        367484,
+                        28,
+                        "IT Architect",
+                        "veribet@company.com"),
                 // 4 - sal_, sub_sal_1, Lowest Salary of sublist(0,5)
-                new Employee("84f48b4c-150a-47b3-bb73-8be88655eb45", "Ms. Gladys Schaden", 126899, 65, "Accounting Assistant", "lotstring@company.com"),
+                new Employee(
+                        "84f48b4c-150a-47b3-bb73-8be88655eb45",
+                        "Ms. Gladys Schaden",
+                        126899,
+                        65,
+                        "Accounting Assistant",
+                        "lotstring@company.com"),
                 // 5 - sal_1
-                new Employee("1500c807-a43a-4d73-9862-a3c4b9331d77", "Andria Schmidt PhD", 275740, 46, "Consulting Facilitator", "lotstring@company.com"),
+                new Employee(
+                        "1500c807-a43a-4d73-9862-a3c4b9331d77",
+                        "Andria Schmidt PhD",
+                        275740,
+                        46,
+                        "Consulting Facilitator",
+                        "lotstring@company.com"),
                 // 6 - sal_
-                new Employee("561d7025-4128-4009-8ec0-2d9fa6c2f429", "Gino Hagenes", 108360, 42, "Mining Representative", "sub-ex@company.com"),
+                new Employee(
+                        "561d7025-4128-4009-8ec0-2d9fa6c2f429",
+                        "Gino Hagenes",
+                        108360,
+                        42,
+                        "Mining Representative",
+                        "sub-ex@company.com"),
                 // 7 - sal_7
-                new Employee("f450a809-ac1c-46a9-9d97-552dc738fde4", "Zandra Stiedemann", 413932, 17, "Future Healthcare Orchestrator", "cookley@company.com"),
+                new Employee(
+                        "f450a809-ac1c-46a9-9d97-552dc738fde4",
+                        "Zandra Stiedemann",
+                        413932,
+                        17,
+                        "Future Healthcare Orchestrator",
+                        "cookley@company.com"),
                 // 8 - sal_5
-                new Employee("f243211a-748e-4e06-bd0e-a31a8fd5515e", "Magaly Huels III", 377301, 51, "Mining Agent", "y-find@company.com"),
+                new Employee(
+                        "f243211a-748e-4e06-bd0e-a31a8fd5515e",
+                        "Magaly Huels III",
+                        377301,
+                        51,
+                        "Mining Agent",
+                        "y-find@company.com"),
                 // 9 - sal_8
-                new Employee("639fd1cc-3fda-4035-893e-e41437ba50a0", "Janiece Braun", 423689, 50, "Central Officer", "colonelkickass@company.com"),
+                new Employee(
+                        "639fd1cc-3fda-4035-893e-e41437ba50a0",
+                        "Janiece Braun",
+                        423689,
+                        50,
+                        "Central Officer",
+                        "colonelkickass@company.com"),
                 // 10 - sal_2
-                new Employee("63d8895b-e5fb-4af4-9acf-c40f8b11fd21", "Antoine Leannon", 334095, 25, "Senior Technology Designer", "bitchin_blair@company.com"),
+                new Employee(
+                        "63d8895b-e5fb-4af4-9acf-c40f8b11fd21",
+                        "Antoine Leannon",
+                        334095,
+                        25,
+                        "Senior Technology Designer",
+                        "bitchin_blair@company.com"),
                 // 11 - sal_3
-                new Employee("fc17c110-12ed-4a9f-849f-d24a84c0096f", "Eboni Graham", 345847, 50, "Farming Facilitator", "prodder@company.com"),
+                new Employee(
+                        "fc17c110-12ed-4a9f-849f-d24a84c0096f",
+                        "Eboni Graham",
+                        345847,
+                        50,
+                        "Farming Facilitator",
+                        "prodder@company.com"),
                 // 12 - sal_
-                new Employee("824af032-38bc-1234-8baa-46e41e24ae4e", "Brandy Marsh", 367484, 28, "IT Architect", "cremefraiche@company.com"),
+                new Employee(
+                        "824af032-38bc-1234-8baa-46e41e24ae4e",
+                        "Brandy Marsh",
+                        367484,
+                        28,
+                        "IT Architect",
+                        "cremefraiche@company.com"),
                 // 13 - sal_null
                 nullSalaryEmployee,
                 // 14 sal_6(tie)
                 duplicateSalaryEmployee,
                 // 15 sal_10(tie)
-                duplicate10thSalaryEmployee
-        );
+                duplicate10thSalaryEmployee);
     }
 
     @AfterEach
-    void tearDown() {
-    }
+    void tearDown() {}
 
     @Test
     void findAll_whenNoEmployees_returnsEmptyList_andDelegatesToClient() {
@@ -99,7 +184,7 @@ class EmployeeServiceTest {
     @Test
     void findAll_whenEmployeesExist_returnsList_andDelegatesToClient() {
         // Given
-        List<Employee> employees = testEmployees.subList(0,2);
+        List<Employee> employees = testEmployees.subList(0, 2);
         Mockito.when(client.getAll()).thenReturn(employees);
 
         // When
@@ -252,36 +337,32 @@ class EmployeeServiceTest {
 
         // Then
         Assertions.assertTrue(result.isPresent());
-        Assertions.assertEquals(testEmployees.get(1).getSalary(),  result.get());
+        Assertions.assertEquals(testEmployees.get(1).getSalary(), result.get());
 
         Mockito.verify(client.getAll());
         Mockito.verifyNoMoreInteractions(client);
     }
 
-//    @Test
-//    void findHighestSalaryOfEmployees_whenNullSalariesExist_returnsSalaryIgnoringNulls() {
-//        // Given
-//        Mockito.when(client.getAll()).thenReturn(testEmployees);
-//
-//        // When
-//        Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
-//
-//        // Then
-//        Assertions.assertTrue(result.isPresent());
-//        Assertions.assertEquals(testEmployees.get(1).getSalary(),  result.get());
-//
-//        Mockito.verify(client.getAll());
-//        Mockito.verifyNoMoreInteractions(client);
-//    }
+    //    @Test
+    //    void findHighestSalaryOfEmployees_whenNullSalariesExist_returnsSalaryIgnoringNulls() {
+    //        // Given
+    //        Mockito.when(client.getAll()).thenReturn(testEmployees);
+    //
+    //        // When
+    //        Optional<Integer> result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
+    //
+    //        // Then
+    //        Assertions.assertTrue(result.isPresent());
+    //        Assertions.assertEquals(testEmployees.get(1).getSalary(),  result.get());
+    //
+    //        Mockito.verify(client.getAll());
+    //        Mockito.verifyNoMoreInteractions(client);
+    //    }
 
     @Test
     void findHighestSalaryOfEmployees_whenAllSalariesNull_returnsEmptyOptional() {
         // Given
-        List<Employee> employeesWithNullSalaries = List.of(
-                new Employee(),
-                new Employee(),
-                new Employee()
-        );
+        List<Employee> employeesWithNullSalaries = List.of(new Employee(), new Employee(), new Employee());
         Mockito.when(client.getAll()).thenReturn(employeesWithNullSalaries);
 
         // When
@@ -313,14 +394,9 @@ class EmployeeServiceTest {
     @Test
     void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() {
         // Given
-        List<Employee> employees = testEmployees.subList(0,5);
-        List<Employee> employeesExpectedOrder = List.of(
-                employees.get(1),
-                employees.get(2),
-                employees.get(0),
-                employees.get(3),
-                employees.get(4)
-        );
+        List<Employee> employees = testEmployees.subList(0, 5);
+        List<Employee> employeesExpectedOrder =
+                List.of(employees.get(1), employees.get(2), employees.get(0), employees.get(3), employees.get(4));
         Mockito.when(client.getAll()).thenReturn(employees);
 
         // When
@@ -330,11 +406,16 @@ class EmployeeServiceTest {
         Assertions.assertNotNull(result);
         Assertions.assertFalse(result.isEmpty());
         Assertions.assertEquals(5, result.size());
-        Assertions.assertEquals(employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
 
         Mockito.verify(client.getAll());
         Mockito.verifyNoMoreInteractions(client);
@@ -353,8 +434,7 @@ class EmployeeServiceTest {
                 testEmployees.get(0),
                 testEmployees.get(0),
                 testEmployees.get(0),
-                testEmployees.get(0)
-        );
+                testEmployees.get(0));
         Mockito.when(client.getAll()).thenReturn(testEmployees);
 
         // When
@@ -364,16 +444,26 @@ class EmployeeServiceTest {
         Assertions.assertNotNull(result);
         Assertions.assertFalse(result.isEmpty());
         Assertions.assertEquals(10, result.size());
-        Assertions.assertEquals(employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
 
         Mockito.verify(client.getAll());
         Mockito.verifyNoMoreInteractions(client);
@@ -392,8 +482,7 @@ class EmployeeServiceTest {
                 testEmployees.get(0),
                 testEmployees.get(0),
                 testEmployees.get(0),
-                testEmployees.get(0)
-        );
+                testEmployees.get(0));
         Mockito.when(client.getAll()).thenReturn(testEmployees);
 
         // When
@@ -403,16 +492,26 @@ class EmployeeServiceTest {
         Assertions.assertNotNull(result);
         Assertions.assertFalse(result.isEmpty());
         Assertions.assertEquals(10, result.size());
-        Assertions.assertEquals(employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
-        Assertions.assertEquals(employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(5).getSalary(), result.get(5).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(6).getSalary(), result.get(6).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(7).getSalary(), result.get(7).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(8).getSalary(), result.get(8).getSalary());
+        Assertions.assertEquals(
+                employeesExpectedOrder.get(9).getSalary(), result.get(9).getSalary());
 
         Mockito.verify(client.getAll());
         Mockito.verifyNoMoreInteractions(client);
@@ -446,7 +545,8 @@ class EmployeeServiceTest {
         employeeToCreate.setAge(age);
         employeeToCreate.setTitle(title);
 
-        Employee employeeCreated = new Employee(id, name, salary, age, title, email); // Adds ID, no email since it's generated
+        Employee employeeCreated =
+                new Employee(id, name, salary, age, title, email); // Adds ID, no email since it's generated
         Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
 
         // When
