@@ -357,7 +357,7 @@ class EmployeeServiceTest {
     @Nested
     class FindHighestSalaryOfEmployeesTests {
         @Test
-        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnsEmptyOptional() throws DownstreamUnavailableException {
+        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnsEmptyOptional() {
             // Given
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
@@ -367,7 +367,7 @@ class EmployeeServiceTest {
             // Then
             Assertions.assertFalse(result.isPresent());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
 
