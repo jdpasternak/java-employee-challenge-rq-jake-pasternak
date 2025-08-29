@@ -322,7 +322,7 @@ class EmployeeServiceTest {
         @Test
         void findById_whenExists_returnsEmployee() throws EmployeeNotFoundException {
             // Given
-            String id = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            UUID id = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042");
             String name = "Sharda Gibson";
             Mockito.when(client.getById(Mockito.eq(id))).thenReturn(testEmployees.get(0));
 
@@ -341,7 +341,7 @@ class EmployeeServiceTest {
         @Test
         void findById_whenNoEmployeeExists_throwEmployeeNotFoundException() {
             // Given
-            String id = "99eff840-bc7d-4a3e-b9c8-b46bbcc4104f";
+            UUID id = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc4104f");
             Mockito.when(client.getById(Mockito.eq(id))).thenReturn(null);
 
             // When
@@ -600,7 +600,7 @@ class EmployeeServiceTest {
         @Test
         void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
             // Given
-            String id = "89eff840-bc7d-4a3e-b9c8-b46bbcc41043"; // Does not exist
+            UUID id = UUID.fromString("89eff840-bc7d-4a3e-b9c8-b46bbcc41043"); // Does not exist
             Mockito.when(client.getById(id)).thenReturn(null);
 
             // When
@@ -614,7 +614,7 @@ class EmployeeServiceTest {
         @Test
         void deleteEmployeeById_whenNameResolves_deletesByName_returnsTrue() throws EmployeeNotFoundException {
             // Given
-            String idToDelete = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            UUID idToDelete = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042");
             String nameToDelete = "Sharda Gibson";
             Mockito.when(client.getById(idToDelete)).thenReturn(testEmployees.get(0));
             Mockito.when(client.deleteByName(nameToDelete)).thenReturn(true);
