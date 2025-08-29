@@ -299,7 +299,13 @@ class EmployeeServiceTest {
     }
 
     @Nested
+    @SpringBootTest
     class FindByIdTests {
+        @MockBean
+        EmployeeClient client;
+
+        @Autowired
+        EmployeeService employeeService;
         @Test
         void findById_whenInvalidUuid_throwsValidationException() {
             // Given
