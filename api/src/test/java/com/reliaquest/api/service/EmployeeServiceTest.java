@@ -670,5 +670,21 @@ class EmployeeServiceTest {
             Mockito.verify(client).deleteByName(nameToDelete);
             Mockito.verifyNoMoreInteractions(client);
         }
+
+        @Test
+        void deleteEmployeeById_whenClientReturnsFalse_throwsEmployeeNotFoundException() {
+            // Given
+            UUID id = UUID.randomUUID();
+            Mockito.when(client.getById(id)).thenReturn(new Employee(id, "X", 100, 20, "T", "e@c"));
+            Mockito.when(client.deleteByName("X")).thenReturn(false);
+
+            // When
+            Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
+
+            // Then
+            Mockito.verify(client).getById(id);
+            Mockito.verify(client).deleteByName("X");
+            Mockito.verifyNoMoreInteractions(client);
+        }
     }
 }
