@@ -50,8 +50,8 @@ public class EmployeeService {
         return null;
     }
 
-    public Employee createEmployee(CreateEmployeeInput employeeInput) throws ValidationException {
-        return null;
+    public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) throws ValidationException {
+        return client.create(employeeInput);
     }
 
     public boolean deleteEmployeeById(UUID id) throws EmployeeNotFoundException {
