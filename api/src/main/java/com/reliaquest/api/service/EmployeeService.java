@@ -15,7 +15,7 @@ import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.UUID;
 
 @Service
@@ -42,8 +42,9 @@ public class EmployeeService {
         return client.getById(id);
     }
 
-    public Optional<Integer> findHighestSalaryOfEmployees() {
-        return null;
+    public OptionalInt findHighestSalaryOfEmployees() {
+        List<Employee> employees = client.getAll();
+        return employees.stream().mapToInt(Employee::getSalary).max();
     }
 
     public List<Employee> findTopTenHighestEarningEmployees() {
