@@ -58,7 +58,10 @@ public class EmployeeService {
     public String deleteEmployeeById(@NotNull UUID id) throws EmployeeNotFoundException {
         Employee employeeFound = client.getById(id);
         String name = employeeFound.getName();
-        client.deleteByName(name);
+        boolean deleted = client.deleteByName(name);
+        if (!deleted) {
+            throw new EmployeeNotFoundException();
+        }
         return name;
     }
 }
