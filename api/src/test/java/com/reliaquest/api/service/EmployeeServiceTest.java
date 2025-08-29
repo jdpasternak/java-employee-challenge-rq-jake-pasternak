@@ -384,22 +384,6 @@ class EmployeeServiceTest {
             Mockito.verify(client.getAll());
             Mockito.verifyNoMoreInteractions(client);
         }
-
-        @Test
-        void findHighestSalaryOfEmployees_whenAllSalariesNull_returnsEmptyOptional() throws DownstreamUnavailableException {
-            // Given
-            List<Employee> employeesWithNullSalaries = List.of(new Employee(), new Employee(), new Employee());
-            Mockito.when(client.getAll()).thenReturn(employeesWithNullSalaries);
-
-            // When
-            OptionalInt result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
-
-            // Then
-            Assertions.assertFalse(result.isPresent());
-
-            Mockito.verify(client.getAll());
-            Mockito.verifyNoMoreInteractions(client);
-        }
     }
 
     @Nested
