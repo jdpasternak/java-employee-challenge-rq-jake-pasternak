@@ -381,7 +381,7 @@ class EmployeeServiceTest {
             Assertions.assertTrue(result.isPresent());
             Assertions.assertEquals(testEmployees.get(1).getSalary(), result.getAsInt());
 
-            Mockito.verify(client.getAll());
+            Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
         }
     }
