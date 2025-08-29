@@ -599,6 +599,18 @@ class EmployeeServiceTest {
         @Autowired
         EmployeeService employeeService;
         @Test
+        void deleteEmployeeById_whenIdInputIsNull_throwsConstraintViolationException() {
+            // Given
+            UUID id = null;
+
+            // When
+            Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.deleteEmployeeById(id));
+
+            // Then
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
         void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
             // Given
             UUID id = UUID.fromString("89eff840-bc7d-4a3e-b9c8-b46bbcc41043"); // Does not exist
