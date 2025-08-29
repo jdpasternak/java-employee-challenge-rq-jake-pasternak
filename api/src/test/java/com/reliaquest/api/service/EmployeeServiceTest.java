@@ -532,7 +532,13 @@ class EmployeeServiceTest {
     }
 
     @Nested
+    @SpringBootTest
     class CreateEmployeeTests {
+        @MockBean
+        EmployeeClient client;
+
+        @Autowired
+        EmployeeService employeeService;
         @Test
         void createEmployee_whenInvalidInput_throwsValidationException() {
             // Given
