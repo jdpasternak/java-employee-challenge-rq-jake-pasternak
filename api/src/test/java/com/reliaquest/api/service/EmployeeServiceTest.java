@@ -388,7 +388,7 @@ class EmployeeServiceTest {
     @Nested
     class FindTopTenHighestEarningEmployeesTests {
         @Test
-        void findTopTenHighestEarningEmployees_whenNoEmployeesExist_returnsEmptyList() throws DownstreamUnavailableException {
+        void findTopTenHighestEarningEmployees_whenNoEmployeesExist_returnsEmptyList() {
             // Given
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
@@ -404,7 +404,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() throws DownstreamUnavailableException {
+        void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() {
             // Given
             List<Employee> employees = testEmployees.subList(0, 5);
             List<Employee> employeesExpectedOrder =
@@ -434,7 +434,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findTopTenHighestEarningEmployees_whenSalariesTie_sortsBySalaryDescThenNameAscThenIdAsc() throws DownstreamUnavailableException {
+        void findTopTenHighestEarningEmployees_whenSalariesTie_sortsBySalaryDescThenNameAscThenIdAsc() {
             // Given
             List<Employee> employeesExpectedOrder = List.of(
                     testEmployees.get(0),
@@ -482,7 +482,7 @@ class EmployeeServiceTest {
         }
 
         @Test
-        void findTopTenHighestEarningEmployees_whenSalariesTieAtPosition10_useNameAsc() throws DownstreamUnavailableException {
+        void findTopTenHighestEarningEmployees_whenSalariesTieAtPosition10_useNameAsc() {
             // Given
             List<Employee> employeesExpectedOrder = List.of(
                     testEmployees.get(0),
