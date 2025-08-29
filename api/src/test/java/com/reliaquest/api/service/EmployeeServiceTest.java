@@ -334,8 +334,8 @@ class EmployeeServiceTest {
             Assertions.assertEquals(id, result.getId());
             Assertions.assertEquals(name, result.getName());
 
-            Mockito.verify(client.getById(id));
-            Mockito.verifyNoInteractions(client);
+            Mockito.verify(client).getById(id);
+            Mockito.verifyNoMoreInteractions(client);
         }
 
         @Test
