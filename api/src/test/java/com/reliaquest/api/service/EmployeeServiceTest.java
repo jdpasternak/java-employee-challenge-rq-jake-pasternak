@@ -41,14 +41,14 @@ class EmployeeServiceTest {
     void setUp() {
         Employee nullSalaryEmployee = new Employee();
         Employee duplicateSalaryEmployee = new Employee(
-                "99eff840-bc7d-4a3e-b9c8-b46bbcc41043",
+                UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41043"),
                 "Shardo Gibsona",
                 378048,
                 32,
                 "Legacy Accounting Executor",
                 "sup-ex@company.com");
         Employee duplicate10thSalaryEmployee = new Employee(
-                "1500c807-a43a-4d73-9862-a3c4b9331d78",
+                UUID.fromString("1500c807-a43a-4d73-9862-a3c4b9331d78"),
                 "Andrio Schmidt PhD",
                 275740,
                 47,
@@ -57,7 +57,7 @@ class EmployeeServiceTest {
         testEmployees = List.of(
                 // 0 - sal_6(tie), sub_sal_3
                 new Employee(
-                        "99eff840-bc7d-4a3e-b9c8-b46bbcc41042",
+                        UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042"),
                         "Sharda Gibson",
                         378048,
                         31,
@@ -65,7 +65,7 @@ class EmployeeServiceTest {
                         "sub-ex@company.com"),
                 // 1 - sal_10, sub_sal_5, Highest Salary of sublist(0,5) and overall.
                 new Employee(
-                        "f5651c6b-e001-46ed-b455-6b4613825de3",
+                        UUID.fromString("f5651c6b-e001-46ed-b455-6b4613825de3"),
                         "Vena Dickens IV",
                         490233,
                         45,
@@ -73,7 +73,7 @@ class EmployeeServiceTest {
                         "blade_runnerz@company.com"),
                 // 2 - sal_9, sub_sal_4
                 new Employee(
-                        "a552a9a2-44a6-4ff4-80ea-28747a70e661",
+                        UUID.fromString("a552a9a2-44a6-4ff4-80ea-28747a70e661"),
                         "Natalia Wyman",
                         433856,
                         56,
@@ -81,7 +81,7 @@ class EmployeeServiceTest {
                         "cardguard@company.com"),
                 // 3 - sal_4, sub_sal_2
                 new Employee(
-                        "824af032-38bc-444a-8baa-46e41e24ae4e",
+                        UUID.fromString("824af032-38bc-444a-8baa-46e41e24ae4e"),
                         "Randall Batz",
                         367484,
                         28,
@@ -89,7 +89,7 @@ class EmployeeServiceTest {
                         "veribet@company.com"),
                 // 4 - sal_, sub_sal_1, Lowest Salary of sublist(0,5)
                 new Employee(
-                        "84f48b4c-150a-47b3-bb73-8be88655eb45",
+                        UUID.fromString("84f48b4c-150a-47b3-bb73-8be88655eb45"),
                         "Ms. Gladys Schaden",
                         126899,
                         65,
@@ -97,7 +97,7 @@ class EmployeeServiceTest {
                         "lotstring@company.com"),
                 // 5 - sal_1
                 new Employee(
-                        "1500c807-a43a-4d73-9862-a3c4b9331d77",
+                        UUID.fromString("1500c807-a43a-4d73-9862-a3c4b9331d77"),
                         "Andria Schmidt PhD",
                         275740,
                         46,
@@ -105,7 +105,7 @@ class EmployeeServiceTest {
                         "lotstring@company.com"),
                 // 6 - sal_
                 new Employee(
-                        "561d7025-4128-4009-8ec0-2d9fa6c2f429",
+                        UUID.fromString("561d7025-4128-4009-8ec0-2d9fa6c2f429"),
                         "Gino Hagenes",
                         108360,
                         42,
@@ -113,7 +113,7 @@ class EmployeeServiceTest {
                         "sub-ex@company.com"),
                 // 7 - sal_7
                 new Employee(
-                        "f450a809-ac1c-46a9-9d97-552dc738fde4",
+                        UUID.fromString("f450a809-ac1c-46a9-9d97-552dc738fde4"),
                         "Zandra Stiedemann",
                         413932,
                         17,
@@ -121,7 +121,7 @@ class EmployeeServiceTest {
                         "cookley@company.com"),
                 // 8 - sal_5
                 new Employee(
-                        "f243211a-748e-4e06-bd0e-a31a8fd5515e",
+                        UUID.fromString("f243211a-748e-4e06-bd0e-a31a8fd5515e"),
                         "Magaly Huels III",
                         377301,
                         51,
@@ -129,7 +129,7 @@ class EmployeeServiceTest {
                         "y-find@company.com"),
                 // 9 - sal_8
                 new Employee(
-                        "639fd1cc-3fda-4035-893e-e41437ba50a0",
+                        UUID.fromString("639fd1cc-3fda-4035-893e-e41437ba50a0"),
                         "Janiece Braun",
                         423689,
                         50,
@@ -137,7 +137,7 @@ class EmployeeServiceTest {
                         "colonelkickass@company.com"),
                 // 10 - sal_2
                 new Employee(
-                        "63d8895b-e5fb-4af4-9acf-c40f8b11fd21",
+                        UUID.fromString("63d8895b-e5fb-4af4-9acf-c40f8b11fd21"),
                         "Antoine Leannon",
                         334095,
                         25,
@@ -145,7 +145,7 @@ class EmployeeServiceTest {
                         "bitchin_blair@company.com"),
                 // 11 - sal_3
                 new Employee(
-                        "fc17c110-12ed-4a9f-849f-d24a84c0096f",
+                        UUID.fromString("fc17c110-12ed-4a9f-849f-d24a84c0096f"),
                         "Eboni Graham",
                         345847,
                         50,
@@ -153,7 +153,7 @@ class EmployeeServiceTest {
                         "prodder@company.com"),
                 // 12 - sal_
                 new Employee(
-                        "824af032-38bc-1234-8baa-46e41e24ae4e",
+                        UUID.fromString("824af032-38bc-1234-8baa-46e41e24ae4e"),
                         "Brandy Marsh",
                         367484,
                         28,
