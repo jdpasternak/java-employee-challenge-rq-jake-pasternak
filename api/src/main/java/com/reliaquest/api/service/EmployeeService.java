@@ -1,6 +1,5 @@
 package com.reliaquest.api.service;
 
-import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
@@ -25,7 +24,7 @@ public class EmployeeService {
     @Autowired
     EmployeeClient client;
 
-    public List<Employee> findAll() throws DownstreamUnavailableException {
+    public List<Employee> findAll() {
         return client.getAll();
     }
 
