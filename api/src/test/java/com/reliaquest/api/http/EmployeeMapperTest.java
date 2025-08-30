@@ -2,16 +2,11 @@ package com.reliaquest.api.http;
 
 import com.reliaquest.api.model.Employee;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
 
 class EmployeeMapperTest {
-
-    @BeforeEach
-    void setUp() {
-    }
 
     @Test
     void toDomain_whenValidInput_returnsEmployee() {
