@@ -409,6 +409,46 @@ class EmployeeClientTest {
             server.verify();
             server.reset();
         }
+
+        @Test
+        void deleteByName_whenServerError_throwsDownstreamUnavailableException() {
+            // Given
+            String nameToDelete = "N";
+
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
+                    .andExpect(MockRestRequestMatchers.content().json("""
+                            {"name":"%s"}
+                            """.formatted(nameToDelete)))
+                    .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+
+            // When
+            Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.deleteByName(nameToDelete));
+
+            // Then
+            server.verify();
+            server.reset();
+        }
+
+        @Test
+        void deleteByName_whenBadRequest_throwsBadGatewayException() {
+            // Given
+            String nameToDelete = "N";
+
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
+                    .andExpect(MockRestRequestMatchers.content().json("""
+                            {"name":"%s"}
+                            """.formatted(nameToDelete)))
+                    .andRespond(MockRestResponseCreators.withStatus(HttpStatus.BAD_REQUEST));
+
+            // When
+            Assertions.assertThrows(BadGatewayException.class, () -> client.deleteByName(nameToDelete));
+
+            // Then
+            server.verify();
+            server.reset();
+        }
     }
 
     @TestConfiguration
