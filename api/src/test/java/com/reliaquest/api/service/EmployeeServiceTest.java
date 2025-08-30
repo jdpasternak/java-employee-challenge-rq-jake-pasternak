@@ -594,7 +594,7 @@ class EmployeeServiceTest {
             int age = 28;
             String title = "Lead Tester";
             String email = "testlead@company.com";
-            UUID id = UUID.randomUUID(); // TODO
+            UUID id = UUID.randomUUID();
             CreateEmployeeInput employeeToCreate = new CreateEmployeeInput(name, salary, age, title);
 
             Employee employeeCreated = new Employee(id, name, salary, age, title, email);
