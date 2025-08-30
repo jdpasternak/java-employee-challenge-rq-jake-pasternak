@@ -208,6 +208,26 @@ class EmployeeClientTest {
     }
 
     @Test
+    void create_whenInvalidInput_throwsConstraintValidationException() {
+        // Given
+        var employeeInput1 = new CreateEmployeeInput("", 1, 20, "T");
+        var employeeInput2 = new CreateEmployeeInput("N", null, 20, "T");
+        var employeeInput3 = new CreateEmployeeInput("N", 1, null, "T");
+        var employeeInput4 = new CreateEmployeeInput("N", 1, 20, "");
+
+        // When
+        Assertions.assertAll(
+                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput1)),
+                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput2)),
+                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput3)),
+                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput4)));
+
+        // Then
+        server.verify();
+    }
+
+
+    @Test
     void create() {
     }
 
