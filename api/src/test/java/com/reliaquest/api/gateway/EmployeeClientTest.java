@@ -377,9 +377,10 @@ class EmployeeClientTest {
                     .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
 
             // When
-            Assertions.assertThrows(EmployeeNotFoundException.class, () -> client.deleteByName(nameToDelete));
+            var result = client.deleteByName(nameToDelete);
 
             // Then
+            Assertions.assertFalse(result);
             server.verify();
             server.reset();
         }
