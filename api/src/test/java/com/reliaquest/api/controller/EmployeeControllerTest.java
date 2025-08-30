@@ -33,12 +33,6 @@ class EmployeeControllerTest {
         var employees = new ArrayList<Employee>();
         Mockito.when(service.findAll()).thenReturn(employees);
 
-        var expectedBody = """
-                {
-                    "status":"Successfully processed request."
-                }
-                """;
-
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
