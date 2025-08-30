@@ -56,7 +56,7 @@ class EmployeeClientTest {
                   "status":"Successfully processed request."
                 }""".formatted(UUID.randomUUID(), UUID.randomUUID());
 
-        server.expect(MockRestRequestMatchers.requestTo("http://localhost:8112/api/v1/employee"))
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
                 .andRespond(MockRestResponseCreators.withSuccess(body, MediaType.APPLICATION_JSON));
 
