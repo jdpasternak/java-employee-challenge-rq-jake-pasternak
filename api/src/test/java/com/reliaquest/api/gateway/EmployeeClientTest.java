@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -104,6 +105,25 @@ class EmployeeClientTest {
         server.expect(MockRestRequestMatchers.requestTo("/employee"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
                 .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        // When
+        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
+
+        // Then
+    }
+
+    @Test
+    void getAll_whenTooManyRequest_throwsDownstreamUnavailableException() {
+        // Given
+        String body = """
+                { "data": [],
+                  "status":"Successfully processed request."
+                }""";
+        var headers = new HttpHeaders();
+        headers.set(HttpHeaders.RETRY_AFTER, "10");
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(headers));
 
         // When
         Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
