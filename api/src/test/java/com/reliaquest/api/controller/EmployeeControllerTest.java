@@ -2,6 +2,7 @@ package com.reliaquest.api.controller;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.model.Employee;
+import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
@@ -87,6 +88,18 @@ class EmployeeControllerTest {
 
     @Test
     void getEmployeesByNameSearch_whenNoEmployeesExist_returnsStatusNoContent() throws Exception {
+        // Given
+        var searchInput = new SearchInput("bob");
+        Mockito.when(service.search(searchInput)).thenReturn(new ArrayList<>());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).search(searchInput);
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
     void getEmployeesByNameSearch_whenNoMatchingNameExists_returnsStatusNoContent() {}
