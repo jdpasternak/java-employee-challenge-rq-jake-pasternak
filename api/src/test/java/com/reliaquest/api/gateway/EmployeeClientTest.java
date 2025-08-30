@@ -51,7 +51,7 @@ class EmployeeClientTest {
                         "employee_age":28,
                         "employee_title":"Documentation Manager",
                         "employee_email":"sallysue@company.com"
-                      },
+                      }
                   ],
                   "status":"Successfully processed request."
                 }""".formatted(UUID.randomUUID(), UUID.randomUUID());
