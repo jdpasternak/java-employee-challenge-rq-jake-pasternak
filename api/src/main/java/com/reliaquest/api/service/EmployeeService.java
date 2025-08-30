@@ -57,16 +57,13 @@ public class EmployeeService {
 
     public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) {
         String employeeName = employeeInput.name();
-        List<Employee> matchedEmployees = search(new SearchInput(employeeName));
-        if (!matchedEmployees.isEmpty()) {
-            List<String> employeeNames = matchedEmployees
-                    .stream()
-                    .map(Employee::getName)
-                    .map(String::toLowerCase)
-                    .toList();
-            if (employeeNames.contains(employeeName.toLowerCase())) {
-                throw new EmployeeWithNameAlreadyExistsException(employeeName);
-            }
+        List<Employee> employees = client.getAll();
+        if (employees
+                .stream()
+                .map(Employee::getName)
+                .map(name -> name.toLowerCase(Locale.ROOT))
+                .anyMatch(employeeName.toLowerCase(Locale.ROOT)::equals)) {
+            throw new EmployeeWithNameAlreadyExistsException(employeeName);
         }
         return client.create(employeeInput);
     }
