@@ -348,9 +348,10 @@ class EmployeeClientTest {
                     .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(httpHeaders));
 
             // When
-            Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
+            var exception = Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
 
             // Then
+            Assertions.assertEquals(Duration.ofSeconds(10), exception.getRetryAfter());
             server.verify();
             server.reset();
         }
