@@ -1,6 +1,7 @@
 package com.reliaquest.api.gateway;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
+import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.http.RestClientConfig;
 import com.reliaquest.api.model.Employee;
 import org.junit.jupiter.api.Assertions;
@@ -132,7 +133,17 @@ class EmployeeClientTest {
     }
 
     @Test
-    void getById() {
+    void getById_whenNotFound_throwsEmployeeNotFoundException() {
+        // Given
+        UUID id = UUID.randomUUID();
+        server.expect(MockRestRequestMatchers.requestTo("/employee/" + id))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.NOT_FOUND));
+
+        // When
+        Assertions.assertThrows(EmployeeNotFoundException.class, () -> client.getById(id));
+
+        // Then
     }
 
     @Test
