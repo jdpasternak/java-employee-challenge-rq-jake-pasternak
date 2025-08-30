@@ -183,6 +183,21 @@ class EmployeeClientTest {
     }
 
     @Test
+    void getById_whenTooManyRequest_throwsDownstreamUnavailableException() {
+        // Given
+        var headers = new HttpHeaders();
+        headers.set(HttpHeaders.RETRY_AFTER, "10");
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(headers));
+
+        // When
+        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
+
+        // Then
+    }
+
+    @Test
     void create() {
     }
 
