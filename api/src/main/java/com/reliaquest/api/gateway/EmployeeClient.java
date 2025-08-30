@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -69,6 +70,18 @@ public class EmployeeClient implements IEmployeeClient {
     }
 
     public boolean deleteByName(String name) throws EmployeeNotFoundException {
-        return false;
+        var type = new ParameterizedTypeReference<Envelope<Boolean>>() {
+        };
+        var body = Map.of("name",name);
+        var entity = new HttpEntity<>(body);
+        var response = restTemplate.exchange(
+                "/employee",
+                HttpMethod.DELETE,
+                entity,
+                type);
+
+        return Boolean.TRUE.equals(Optional.ofNullable(response.getBody())
+                .map(Envelope::data)
+                .orElse(null));
     }
 }
