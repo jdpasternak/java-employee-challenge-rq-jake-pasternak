@@ -3,12 +3,16 @@ package com.reliaquest.api.gateway;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.http.RestClientConfig;
+import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
+import jakarta.validation.ConstraintViolationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -17,17 +21,19 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
+import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
+
 @RestClientTest(EmployeeClient.class)
-@Import(RestClientConfig.class)
+@Import({RestClientConfig.class, EmployeeClientTest.MethodValidationConfiguration.class})
 class EmployeeClientTest {
 
     @Autowired
-    EmployeeClient client;
+    IEmployeeClient client;
 
     @Autowired
     MockRestServiceServer server;
@@ -207,5 +213,13 @@ class EmployeeClientTest {
 
     @Test
     void deleteByName() {
+    }
+
+    @TestConfiguration
+    static class MethodValidationConfiguration {
+        @Bean
+        static MethodValidationPostProcessor methodValidationPostProcessor() {
+            return new MethodValidationPostProcessor();
+        }
     }
 }
