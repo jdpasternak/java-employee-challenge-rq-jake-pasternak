@@ -2,6 +2,7 @@ package com.reliaquest.api.controller;
 
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
+import com.reliaquest.api.service.EmployeeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,12 @@ import java.util.List;
 @RequestMapping("/api/v1/employee")
 @RequiredArgsConstructor
 public class EmployeeController implements IEmployeeController<Employee, CreateEmployeeInput> {
+
+    EmployeeService employeeService;
+
+    public EmployeeController(EmployeeService employeeService) {
+        this.employeeService = employeeService;
+    }
 
     @Override
     public ResponseEntity<List<Employee>> getAllEmployees() {
