@@ -12,6 +12,7 @@ public class RestClientConfig {
     RestTemplate employeeRestTemplate(RestTemplateBuilder builder) {
         return builder
                 .rootUri("http://localhost:8112/api/v1")
+                .errorHandler(new DownstreamErrorHandler())
                 .build();
     }
 }
