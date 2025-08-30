@@ -1,5 +1,6 @@
 package com.reliaquest.api.gateway;
 
+import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.http.RestClientConfig;
 import com.reliaquest.api.model.Employee;
 import org.junit.jupiter.api.Assertions;
@@ -9,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
@@ -69,6 +71,44 @@ class EmployeeClientTest {
         Assertions.assertEquals(2, employees.size());
         Assertions.assertTrue(employees.stream().map(Employee::getName).toList()
                 .containsAll(List.of("Bill Bob", "Sally Sue")));
+    }
+
+    @Test
+    void getAll_whenNoEmployeesExist_returnsEmptyList() {
+        // Given
+        String body = """
+                { "data": [],
+                  "status":"Successfully processed request."
+                }""";
+
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withSuccess(body, MediaType.APPLICATION_JSON));
+
+        // When
+        List<Employee> employees = client.getAll();
+
+        // Then
+        Assertions.assertNotNull(employees);
+        Assertions.assertTrue(employees.isEmpty());
+    }
+
+    @Test
+    void getAll_whenServerError_throwsDownstreamUnavailableException() {
+        // Given
+        String body = """
+                { "data": [],
+                  "status":"Successfully processed request."
+                }""";
+
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        // When
+        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
+
+        // Then
     }
 
     @Test
