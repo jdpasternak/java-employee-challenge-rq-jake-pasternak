@@ -360,6 +360,8 @@ class EmployeeClientTest {
 
     @Test
     void deleteByName() {
+    @Nested
+    class DeleteByNameTests {
     }
 
     @TestConfiguration
