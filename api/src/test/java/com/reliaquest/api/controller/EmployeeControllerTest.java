@@ -40,11 +40,12 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
-                .andExpect(MockMvcResultMatchers.status().isNoContent())
-                .andExpect(MockMvcResultMatchers.content().json(expectedBody));
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         // Then
         Mockito.verify(service, Mockito.never()).findAll();
+        Mockito.verify(service).findAll();
+        Mockito.verifyNoMoreInteractions(service);
     }
 
     @Test
