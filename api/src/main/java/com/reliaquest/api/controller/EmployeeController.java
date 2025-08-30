@@ -21,7 +21,12 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<List<Employee>> getAllEmployees() {
-        return null;
+        var employees = employeeService.findAll();
+        if (employees.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        } else {
+            return ResponseEntity.ok(employees);
+        }
     }
 
     @Override
