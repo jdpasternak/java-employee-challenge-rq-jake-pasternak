@@ -1,5 +1,6 @@
 package com.reliaquest.api.gateway;
 
+import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.http.RestClientConfig;
@@ -228,7 +229,85 @@ class EmployeeClientTest {
 
 
     @Test
-    void create() {
+    void create_whenValidInput_returnsCreatedEmployee() {
+        // Given
+        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+        var expectedBody = """
+                { "data": {
+                    "id":"11111111-1111-1111-1111-111111111111",
+                    "employee_name":"N",
+                    "employee_salary":1,
+                    "employee_age":20,
+                    "employee_title":"T",
+                    "employee_email":"test@company.com"
+                  },
+                  "status":"Successfully processed request."
+                }""";
+
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockRestRequestMatchers.content().json("""
+                        {"name":"N","salary":1,"age":20,"title":"T"}
+                        """))
+                .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
+
+        // When
+        var result = client.create(employeeInput);
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals("N", result.getName()),
+                () -> Assertions.assertEquals(1, result.getSalary()),
+                () -> Assertions.assertEquals(20, result.getAge()),
+                () -> Assertions.assertEquals("T", result.getTitle()),
+                () -> Assertions.assertEquals(UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                        result.getId()),
+                () -> Assertions.assertEquals("test@company.com", result.getEmail())
+        );
+
+        server.verify();
+    }
+
+    @Test
+    void create_whenServerError_throwsDownstreamUnavailableException() {
+        // Given
+        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockRestRequestMatchers.content().json("""
+                        {"name":"N","salary":1,"age":20,"title":"T"}
+                        """))
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+
+        // When
+        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
+
+        // Then
+        server.verify();
+    }
+
+    @Test
+    void create_whenBadRequest_throwsBadGatewayException() {
+        // Given
+        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockRestRequestMatchers.content().json("""
+                        {"name":"N","salary":1,"age":20,"title":"T"}
+                        """))
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.BAD_REQUEST));
+
+        // When
+        Assertions.assertThrows(BadGatewayException.class, () -> client.create(employeeInput));
+
+        // Then
+        server.verify();
     }
 
     @Test
