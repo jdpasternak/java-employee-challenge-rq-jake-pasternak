@@ -86,8 +86,18 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getEmployeesByNameSearch() {
+    void getEmployeesByNameSearch_whenNoEmployeesExist_returnsStatusNoContent() throws Exception {
     }
+    @Test
+    void getEmployeesByNameSearch_whenNoMatchingNameExists_returnsStatusNoContent() {}
+    @Test
+    void getEmployeesByNameSearch_whenMatchingNameExists_returnsEmployee() {}
+    @Test
+    void getEmployeesByNameSearch_whenMultipleMatchingNamesExist_returnsListOfEmployees() {}
+    @Test
+    void getEmployeesByNameSearch_whenConnectRefused_returnsStatusServerError() {}
+    @Test
+    void getEmployeesByNameSearch_whenSearchStringEmpty_returnsStatusBadRequest() {}
 
     @Test
     void getEmployeeById() {
