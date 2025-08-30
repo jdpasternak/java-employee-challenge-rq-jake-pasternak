@@ -3,13 +3,12 @@ package com.reliaquest.api.http;
 import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
+import java.time.Duration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.client.MockClientHttpResponse;
-
-import java.time.Duration;
 
 class DownstreamErrorHandlerTest {
     private final DownstreamErrorHandler downstreamErrorHandler = new DownstreamErrorHandler();
@@ -47,7 +46,8 @@ class DownstreamErrorHandlerTest {
         response.getHeaders().add(HttpHeaders.RETRY_AFTER, "2");
 
         // When
-        var ex = Assertions.assertThrows(DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
+        var ex = Assertions.assertThrows(
+                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
 
         // Then
         Assertions.assertEquals(Duration.ofSeconds(2), ex.getRetryAfter());
@@ -62,7 +62,8 @@ class DownstreamErrorHandlerTest {
         response.getHeaders().add(HttpHeaders.RETRY_AFTER, "garbage");
 
         // When
-        var ex = Assertions.assertThrows(DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
+        var ex = Assertions.assertThrows(
+                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
 
         // Then
         Assertions.assertNull(ex.getRetryAfter());
@@ -76,7 +77,8 @@ class DownstreamErrorHandlerTest {
         var response = new MockClientHttpResponse(new byte[0], HttpStatus.SERVICE_UNAVAILABLE);
 
         // When
-        Assertions.assertThrows(DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
+        Assertions.assertThrows(
+                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
 
         // Then
 

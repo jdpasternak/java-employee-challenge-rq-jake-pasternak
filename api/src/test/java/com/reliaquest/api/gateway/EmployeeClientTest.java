@@ -7,7 +7,13 @@ import com.reliaquest.api.http.RestClientConfig;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import jakarta.validation.ConstraintViolationException;
-import org.junit.jupiter.api.*;
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -22,11 +28,6 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
 
-import java.time.Duration;
-import java.util.List;
-import java.util.UUID;
-
-
 @RestClientTest(EmployeeClient.class)
 @Import({RestClientConfig.class, EmployeeClientTest.MethodValidationConfiguration.class})
 class EmployeeClientTest {
@@ -38,13 +39,13 @@ class EmployeeClientTest {
     MockRestServiceServer server;
 
     @BeforeEach
-    void setUp() {
-    }
+    void setUp() {}
 
     @Test
     void getAll_whenEmployeesExist_returnsListOfEmployees() {
         // Given
-        String body = """
+        String body =
+                """
                 { "data": [
                       {
                         "id":"%s",
@@ -64,7 +65,8 @@ class EmployeeClientTest {
                       }
                   ],
                   "status":"Successfully processed request."
-                }""".formatted(UUID.randomUUID(), UUID.randomUUID());
+                }"""
+                        .formatted(UUID.randomUUID(), UUID.randomUUID());
 
         server.expect(MockRestRequestMatchers.requestTo("/employee"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
@@ -77,8 +79,8 @@ class EmployeeClientTest {
         Assertions.assertNotNull(employees);
         Assertions.assertFalse(employees.isEmpty());
         Assertions.assertEquals(2, employees.size());
-        Assertions.assertTrue(employees.stream().map(Employee::getName).toList()
-                .containsAll(List.of("Bill Bob", "Sally Sue")));
+        Assertions.assertTrue(
+                employees.stream().map(Employee::getName).toList().containsAll(List.of("Bill Bob", "Sally Sue")));
 
         server.verify();
         server.reset();
@@ -87,7 +89,8 @@ class EmployeeClientTest {
     @Test
     void getAll_whenNoEmployeesExist_returnsEmptyList() {
         // Given
-        String body = """
+        String body =
+                """
                 { "data": [],
                   "status":"Successfully processed request."
                 }""";
@@ -110,7 +113,8 @@ class EmployeeClientTest {
     @Test
     void getAll_whenServerError_throwsDownstreamUnavailableException() {
         // Given
-        String body = """
+        String body =
+                """
                 { "data": [],
                   "status":"Successfully processed request."
                 }""";
@@ -130,7 +134,8 @@ class EmployeeClientTest {
     @Test
     void getAll_whenTooManyRequest_throwsDownstreamUnavailableException() {
         // Given
-        String body = """
+        String body =
+                """
                 { "data": [],
                   "status":"Successfully processed request."
                 }""";
@@ -138,7 +143,8 @@ class EmployeeClientTest {
         headers.set(HttpHeaders.RETRY_AFTER, "10");
         server.expect(MockRestRequestMatchers.requestTo("/employee"))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
-                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(headers));
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS)
+                        .headers(headers));
 
         // When
         Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
@@ -169,7 +175,8 @@ class EmployeeClientTest {
         // Given
         String idToFind = "11111111-1111-1111-1111-111111111111";
         UUID uuidToFind = UUID.fromString(idToFind);
-        String body = """
+        String body =
+                """
                 { "data": {
                     "id":"%s",
                     "employee_name":"Bill Bob",
@@ -179,7 +186,8 @@ class EmployeeClientTest {
                     "employee_email":"billBob@company.com"
                   },
                   "status":"Successfully processed request."
-                }""".formatted("11111111-1111-1111-1111-111111111111");
+                }"""
+                        .formatted("11111111-1111-1111-1111-111111111111");
         server.expect(MockRestRequestMatchers.requestTo("/employee/" + idToFind))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
                 .andRespond(MockRestResponseCreators.withSuccess(body, MediaType.APPLICATION_JSON));
@@ -195,8 +203,7 @@ class EmployeeClientTest {
                 () -> Assertions.assertEquals(89750, result.getSalary()),
                 () -> Assertions.assertEquals(24, result.getAge()),
                 () -> Assertions.assertEquals("Documentation Engineer", result.getTitle()),
-                () -> Assertions.assertEquals("billBob@company.com", result.getEmail())
-        );
+                () -> Assertions.assertEquals("billBob@company.com", result.getEmail()));
 
         server.verify();
         server.reset();
@@ -211,7 +218,8 @@ class EmployeeClientTest {
         headers.set(HttpHeaders.RETRY_AFTER, "10");
         server.expect(MockRestRequestMatchers.requestTo("/employee/" + idToFind))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
-                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(headers));
+                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS)
+                        .headers(headers));
 
         // When
         var exception = Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getById(uuidToFind));
@@ -235,39 +243,46 @@ class EmployeeClientTest {
 
             // When
             Assertions.assertAll(
-                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput1)),
-                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput2)),
-                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput3)),
-                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput4)));
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class, () -> client.create(employeeInput1)),
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class, () -> client.create(employeeInput2)),
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class, () -> client.create(employeeInput3)),
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class, () -> client.create(employeeInput4)));
 
             // Then
             server.verify();
             server.reset();
         }
 
-
         @Test
         void create_whenValidInput_returnsCreatedEmployee() {
             // Given
             var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
-            var expectedBody = """
-                { "data": {
-                    "id":"11111111-1111-1111-1111-111111111111",
-                    "employee_name":"N",
-                    "employee_salary":1,
-                    "employee_age":20,
-                    "employee_title":"T",
-                    "employee_email":"test@company.com"
-                  },
-                  "status":"Successfully processed request."
-                }""";
+            var expectedBody =
+                    """
+                    { "data": {
+                        "id":"11111111-1111-1111-1111-111111111111",
+                        "employee_name":"N",
+                        "employee_salary":1,
+                        "employee_age":20,
+                        "employee_title":"T",
+                        "employee_email":"test@company.com"
+                      },
+                      "status":"Successfully processed request."
+                    }""";
 
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
                     .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(MockRestRequestMatchers.content().json("""
-                        {"name":"N","salary":1,"age":20,"title":"T"}
-                        """))
+                    .andExpect(
+                            MockRestRequestMatchers.content()
+                                    .json(
+                                            """
+                            {"name":"N","salary":1,"age":20,"title":"T"}
+                            """))
                     .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
 
             // When
@@ -280,10 +295,9 @@ class EmployeeClientTest {
                     () -> Assertions.assertEquals(1, result.getSalary()),
                     () -> Assertions.assertEquals(20, result.getAge()),
                     () -> Assertions.assertEquals("T", result.getTitle()),
-                    () -> Assertions.assertEquals(UUID.fromString("11111111-1111-1111-1111-111111111111"),
-                            result.getId()),
-                    () -> Assertions.assertEquals("test@company.com", result.getEmail())
-            );
+                    () -> Assertions.assertEquals(
+                            UUID.fromString("11111111-1111-1111-1111-111111111111"), result.getId()),
+                    () -> Assertions.assertEquals("test@company.com", result.getEmail()));
 
             server.verify();
             server.reset();
@@ -297,9 +311,12 @@ class EmployeeClientTest {
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
                     .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(MockRestRequestMatchers.content().json("""
-                        {"name":"N","salary":1,"age":20,"title":"T"}
-                        """))
+                    .andExpect(
+                            MockRestRequestMatchers.content()
+                                    .json(
+                                            """
+                            {"name":"N","salary":1,"age":20,"title":"T"}
+                            """))
                     .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
             // When
@@ -318,9 +335,12 @@ class EmployeeClientTest {
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
                     .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(MockRestRequestMatchers.content().json("""
-                        {"name":"N","salary":1,"age":20,"title":"T"}
-                        """))
+                    .andExpect(
+                            MockRestRequestMatchers.content()
+                                    .json(
+                                            """
+                            {"name":"N","salary":1,"age":20,"title":"T"}
+                            """))
                     .andRespond(MockRestResponseCreators.withStatus(HttpStatus.BAD_REQUEST));
 
             // When
@@ -330,7 +350,6 @@ class EmployeeClientTest {
             server.verify();
             server.reset();
         }
-
 
         @Test
         void create_whenTooManyRequests_noRetry() {
@@ -342,13 +361,18 @@ class EmployeeClientTest {
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
                     .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(MockRestRequestMatchers.content().json("""
-                        {"name":"N","salary":1,"age":20,"title":"T"}
-                        """))
-                    .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(httpHeaders));
+                    .andExpect(
+                            MockRestRequestMatchers.content()
+                                    .json(
+                                            """
+                            {"name":"N","salary":1,"age":20,"title":"T"}
+                            """))
+                    .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS)
+                            .headers(httpHeaders));
 
             // When
-            var exception = Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
+            var exception =
+                    Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
 
             // Then
             Assertions.assertEquals(Duration.ofSeconds(10), exception.getRetryAfter());
@@ -357,23 +381,25 @@ class EmployeeClientTest {
         }
     }
 
-
     @Nested
     class DeleteByNameTests {
         @Test
         void deleteByName_whenNoEmployeeExists_returnsFalse() {
             // Given
             String nameToDelete = "N";
-            String expectedBody = """
+            String expectedBody =
+                    """
                     { "data": false,
                       "status":"Successfully processed request."
                     }""";
 
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
-                    .andExpect(MockRestRequestMatchers.content().json("""
+                    .andExpect(MockRestRequestMatchers.content()
+                            .json("""
                             {"name":"%s"}
-                            """.formatted(nameToDelete)))
+                            """
+                                    .formatted(nameToDelete)))
                     .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
 
             // When
@@ -389,16 +415,19 @@ class EmployeeClientTest {
         void deleteByName_whenEmployeeExists_returnsTrue() {
             // Given
             String nameToDelete = "N";
-            String expectedBody = """
+            String expectedBody =
+                    """
                     { "data": true,
                       "status":"Successfully processed request."
                     }""";
 
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
-                    .andExpect(MockRestRequestMatchers.content().json("""
+                    .andExpect(MockRestRequestMatchers.content()
+                            .json("""
                             {"name":"%s"}
-                            """.formatted(nameToDelete)))
+                            """
+                                    .formatted(nameToDelete)))
                     .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
 
             // When
@@ -417,9 +446,11 @@ class EmployeeClientTest {
 
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
-                    .andExpect(MockRestRequestMatchers.content().json("""
+                    .andExpect(MockRestRequestMatchers.content()
+                            .json("""
                             {"name":"%s"}
-                            """.formatted(nameToDelete)))
+                            """
+                                    .formatted(nameToDelete)))
                     .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
             // When
@@ -437,9 +468,11 @@ class EmployeeClientTest {
 
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
-                    .andExpect(MockRestRequestMatchers.content().json("""
+                    .andExpect(MockRestRequestMatchers.content()
+                            .json("""
                             {"name":"%s"}
-                            """.formatted(nameToDelete)))
+                            """
+                                    .formatted(nameToDelete)))
                     .andRespond(MockRestResponseCreators.withStatus(HttpStatus.BAD_REQUEST));
 
             // When

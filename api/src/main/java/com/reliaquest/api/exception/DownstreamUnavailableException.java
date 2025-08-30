@@ -1,9 +1,8 @@
 package com.reliaquest.api.exception;
 
+import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.Duration;
 
 public class DownstreamUnavailableException extends RuntimeException {
 

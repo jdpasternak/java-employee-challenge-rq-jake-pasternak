@@ -2,10 +2,9 @@ package com.reliaquest.api.http;
 
 import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.model.Employee;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
 
 class EmployeeMapperTest {
 
@@ -26,8 +25,7 @@ class EmployeeMapperTest {
                 () -> Assertions.assertEquals(1, result.getSalary()),
                 () -> Assertions.assertEquals(20, result.getAge()),
                 () -> Assertions.assertEquals("T", result.getTitle()),
-                () -> Assertions.assertEquals("e@c", result.getEmail())
-        );
+                () -> Assertions.assertEquals("e@c", result.getEmail()));
     }
 
     @Test

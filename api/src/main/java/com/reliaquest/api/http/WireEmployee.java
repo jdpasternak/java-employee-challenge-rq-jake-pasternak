@@ -8,5 +8,4 @@ public record WireEmployee(
         @JsonProperty("employee_salary") Integer employeeSalary,
         @JsonProperty("employee_age") Integer employeeAge,
         @JsonProperty("employee_title") String employeeTitle,
-        @JsonProperty("employee_email") String employeeEmail
-) {}
+        @JsonProperty("employee_email") String employeeEmail) {}

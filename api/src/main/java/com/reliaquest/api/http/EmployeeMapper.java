@@ -3,7 +3,6 @@ package com.reliaquest.api.http;
 import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-
 import java.util.UUID;
 
 public final class EmployeeMapper {
@@ -34,8 +33,7 @@ public final class EmployeeMapper {
                 wireEmployee.employeeSalary(),
                 wireEmployee.employeeAge(),
                 wireEmployee.employeeTitle(),
-                wireEmployee.employeeEmail()
-        );
+                wireEmployee.employeeEmail());
     }
 
     public static WireCreateEmployee toWire(CreateEmployeeInput createEmployeeInput) {
