@@ -1,6 +1,7 @@
 package com.reliaquest.api.http;
 
 import com.reliaquest.api.exception.BadGatewayException;
+import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 
 import java.util.UUID;
@@ -35,6 +36,14 @@ public final class EmployeeMapper {
                 wireEmployee.employeeTitle(),
                 wireEmployee.employeeEmail()
         );
+    }
+
+    public static WireCreateEmployee toWire(CreateEmployeeInput createEmployeeInput) {
+        return new WireCreateEmployee(
+                createEmployeeInput.name(),
+                createEmployeeInput.salary(),
+                createEmployeeInput.age(),
+                createEmployeeInput.title());
     }
 
     private static UUID parseUuid(String uuidString) {
