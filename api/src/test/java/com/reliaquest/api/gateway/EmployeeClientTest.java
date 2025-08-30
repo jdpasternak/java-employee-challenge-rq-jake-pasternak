@@ -18,6 +18,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
@@ -185,16 +186,19 @@ class EmployeeClientTest {
     @Test
     void getById_whenTooManyRequest_throwsDownstreamUnavailableException() {
         // Given
+        String idToFind = "11111111-1111-1111-1111-111111111111";
+        UUID uuidToFind = UUID.fromString(idToFind);
         var headers = new HttpHeaders();
         headers.set(HttpHeaders.RETRY_AFTER, "10");
-        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+        server.expect(MockRestRequestMatchers.requestTo("/employee/" + idToFind))
                 .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
                 .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(headers));
 
         // When
-        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
+        var exception = Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getById(uuidToFind));
 
         // Then
+        Assertions.assertEquals(Duration.ofSeconds(10), exception.getRetryAfter());
     }
 
     @Test
