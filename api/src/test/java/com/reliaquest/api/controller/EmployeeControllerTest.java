@@ -43,7 +43,6 @@ class EmployeeControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
 
         // Then
-        Mockito.verify(service, Mockito.never()).findAll();
         Mockito.verify(service).findAll();
         Mockito.verifyNoMoreInteractions(service);
     }
