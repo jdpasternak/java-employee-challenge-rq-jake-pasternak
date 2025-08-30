@@ -1,14 +1,32 @@
 package com.reliaquest.api.http;
 
+import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.model.Employee;
 
-import java.util.Objects;
 import java.util.UUID;
 
 public final class EmployeeMapper {
     public static Employee toDomain(WireEmployee wireEmployee) {
-        Objects.requireNonNull(wireEmployee.employeeSalary(), "downstream salary null");
-        Objects.requireNonNull(wireEmployee.employeeAge(), "downstream age null");
+        if (wireEmployee == null) throw new BadGatewayException("downstream returned null employee");
+
+        final UUID id = parseUuid(wireEmployee.id());
+
+        final Integer salary = wireEmployee.employeeSalary();
+        if (salary == null) {
+            throw new BadGatewayException("downstream employee_salary missing");
+        }
+        if (salary <= 0) {
+            throw new BadGatewayException("downstream employee_salary <= 0");
+        }
+
+        final Integer age = wireEmployee.employeeAge();
+        if (age == null) {
+            throw new BadGatewayException("downstream employee_age missing");
+        }
+        if (age < 16 || age > 75) {
+            throw new BadGatewayException("downstream employee_age out of range: " + age);
+        }
+
         return new Employee(
                 UUID.fromString(wireEmployee.id()),
                 wireEmployee.employeeName(),
@@ -17,5 +35,13 @@ public final class EmployeeMapper {
                 wireEmployee.employeeTitle(),
                 wireEmployee.employeeEmail()
         );
+    }
+
+    private static UUID parseUuid(String uuidString) {
+        try {
+            return UUID.fromString(uuidString);
+        } catch (RuntimeException runtimeException) {
+            throw new BadGatewayException("downstream employee id is not a UUID: " + uuidString, runtimeException);
+        }
     }
 }
