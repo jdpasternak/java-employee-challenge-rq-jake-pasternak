@@ -25,7 +25,24 @@ class EmployeeControllerTest {
     EmployeeService service;
 
     @Test
-    void getAllEmployees() {
+    void getAllEmployees_whenNoEmployeesExist_returnsNoContent() throws Exception {
+        // Given
+        var employees = new ArrayList<Employee>();
+        Mockito.when(service.findAll()).thenReturn(employees);
+
+        var expectedBody = """
+                {
+                    "status":"Successfully processed request."
+                }
+                """;
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.content().json(expectedBody));
+
+        // Then
+        Mockito.verify(service, Mockito.never()).findAll();
     }
 
     @Test
