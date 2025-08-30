@@ -147,6 +147,42 @@ class EmployeeClientTest {
     }
 
     @Test
+    void getById_whenEmployeeWithIdExists_returnsEmployee() {
+        // Given
+        String idToFind = "11111111-1111-1111-1111-111111111111";
+        UUID uuidToFind = UUID.fromString(idToFind);
+        String body = """
+                { "data": {
+                    "id":"%s",
+                    "employee_name":"Bill Bob",
+                    "employee_salary":89750,
+                    "employee_age":24,
+                    "employee_title":"Documentation Engineer",
+                    "employee_email":"billBob@company.com"
+                  },
+                  "status":"Successfully processed request."
+                }""".formatted("11111111-1111-1111-1111-111111111111");
+        server.expect(MockRestRequestMatchers.requestTo("/employee/" + idToFind))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withSuccess(body, MediaType.APPLICATION_JSON));
+
+        // When
+        Employee result = client.getById(uuidToFind);
+
+        // Then
+        Assertions.assertNotNull(result);
+        Assertions.assertAll(
+                () -> Assertions.assertEquals(uuidToFind, result.getId()),
+                () -> Assertions.assertEquals("Bill Bob", result.getName()),
+                () -> Assertions.assertEquals(89750, result.getSalary()),
+                () -> Assertions.assertEquals(24, result.getAge()),
+                () -> Assertions.assertEquals("Documentation Engineer", result.getTitle()),
+                () -> Assertions.assertEquals("billBob@company.com", result.getEmail())
+        );
+
+    }
+
+    @Test
     void create() {
     }
 
