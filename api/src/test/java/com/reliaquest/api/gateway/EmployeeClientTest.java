@@ -7,9 +7,7 @@ import com.reliaquest.api.http.RestClientConfig;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import jakarta.validation.ConstraintViolationException;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.client.RestClientTest;
 import org.springframework.boot.test.context.TestConfiguration;
@@ -208,31 +206,33 @@ class EmployeeClientTest {
         Assertions.assertEquals(Duration.ofSeconds(10), exception.getRetryAfter());
     }
 
-    @Test
-    void create_whenInvalidInput_throwsConstraintValidationException() {
-        // Given
-        var employeeInput1 = new CreateEmployeeInput("", 1, 20, "T");
-        var employeeInput2 = new CreateEmployeeInput("N", null, 20, "T");
-        var employeeInput3 = new CreateEmployeeInput("N", 1, null, "T");
-        var employeeInput4 = new CreateEmployeeInput("N", 1, 20, "");
+    @Nested
+    class CreateTests {
+        @Test
+        void create_whenInvalidInput_throwsConstraintValidationException() {
+            // Given
+            var employeeInput1 = new CreateEmployeeInput("", 1, 20, "T");
+            var employeeInput2 = new CreateEmployeeInput("N", null, 20, "T");
+            var employeeInput3 = new CreateEmployeeInput("N", 1, null, "T");
+            var employeeInput4 = new CreateEmployeeInput("N", 1, 20, "");
 
-        // When
-        Assertions.assertAll(
-                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput1)),
-                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput2)),
-                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput3)),
-                () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput4)));
+            // When
+            Assertions.assertAll(
+                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput1)),
+                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput2)),
+                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput3)),
+                    () -> Assertions.assertThrows(ConstraintViolationException.class, () -> client.create(employeeInput4)));
 
-        // Then
-        server.verify();
-    }
+            // Then
+            server.verify();
+        }
 
 
-    @Test
-    void create_whenValidInput_returnsCreatedEmployee() {
-        // Given
-        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
-        var expectedBody = """
+        @Test
+        void create_whenValidInput_returnsCreatedEmployee() {
+            // Given
+            var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+            var expectedBody = """
                 { "data": {
                     "id":"11111111-1111-1111-1111-111111111111",
                     "employee_name":"N",
@@ -244,71 +244,79 @@ class EmployeeClientTest {
                   "status":"Successfully processed request."
                 }""";
 
-        server.expect(MockRestRequestMatchers.requestTo("/employee"))
-                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
-                .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockRestRequestMatchers.content().json("""
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                    .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockRestRequestMatchers.content().json("""
                         {"name":"N","salary":1,"age":20,"title":"T"}
                         """))
-                .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
+                    .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
 
         // When
         var result = client.create(employeeInput);
+            // When
+            var result = client.create(employeeInput);
 
-        // Then
-        Assertions.assertNotNull(result);
-        Assertions.assertAll(
-                () -> Assertions.assertEquals("N", result.getName()),
-                () -> Assertions.assertEquals(1, result.getSalary()),
-                () -> Assertions.assertEquals(20, result.getAge()),
-                () -> Assertions.assertEquals("T", result.getTitle()),
-                () -> Assertions.assertEquals(UUID.fromString("11111111-1111-1111-1111-111111111111"),
-                        result.getId()),
-                () -> Assertions.assertEquals("test@company.com", result.getEmail())
-        );
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals("N", result.getName()),
+                    () -> Assertions.assertEquals(1, result.getSalary()),
+                    () -> Assertions.assertEquals(20, result.getAge()),
+                    () -> Assertions.assertEquals("T", result.getTitle()),
+                    () -> Assertions.assertEquals(UUID.fromString("11111111-1111-1111-1111-111111111111"),
+                            result.getId()),
+                    () -> Assertions.assertEquals("test@company.com", result.getEmail())
+            );
 
-        server.verify();
-    }
+            server.verify();
+        }
 
-    @Test
-    void create_whenServerError_throwsDownstreamUnavailableException() {
-        // Given
-        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+        @Test
+        void create_whenServerError_throwsDownstreamUnavailableException() {
+            // Given
+            var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
 
-        server.expect(MockRestRequestMatchers.requestTo("/employee"))
-                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
-                .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockRestRequestMatchers.content().json("""
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                    .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockRestRequestMatchers.content().json("""
                         {"name":"N","salary":1,"age":20,"title":"T"}
                         """))
-                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
+                    .andRespond(MockRestResponseCreators.withStatus(HttpStatus.INTERNAL_SERVER_ERROR));
 
-        // When
-        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
+            // When
+            Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
 
-        // Then
-        server.verify();
-    }
+            // Then
+            server.verify();
+        }
 
-    @Test
-    void create_whenBadRequest_throwsBadGatewayException() {
-        // Given
-        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+        @Test
+        void create_whenBadRequest_throwsBadGatewayException() {
+            // Given
+            var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
 
-        server.expect(MockRestRequestMatchers.requestTo("/employee"))
-                .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
-                .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(MockRestRequestMatchers.content().json("""
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                    .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockRestRequestMatchers.content().json("""
                         {"name":"N","salary":1,"age":20,"title":"T"}
                         """))
-                .andRespond(MockRestResponseCreators.withStatus(HttpStatus.BAD_REQUEST));
+                    .andRespond(MockRestResponseCreators.withStatus(HttpStatus.BAD_REQUEST));
 
-        // When
-        Assertions.assertThrows(BadGatewayException.class, () -> client.create(employeeInput));
+            // When
+            Assertions.assertThrows(BadGatewayException.class, () -> client.create(employeeInput));
 
         // Then
         server.verify();
     }
+            // Then
+            server.verify();
+        }
+
+    }
+
 
     @Test
     void deleteByName() {
