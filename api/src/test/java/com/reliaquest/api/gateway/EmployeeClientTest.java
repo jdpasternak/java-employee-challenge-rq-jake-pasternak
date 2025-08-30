@@ -79,6 +79,9 @@ class EmployeeClientTest {
         Assertions.assertEquals(2, employees.size());
         Assertions.assertTrue(employees.stream().map(Employee::getName).toList()
                 .containsAll(List.of("Bill Bob", "Sally Sue")));
+
+        server.verify();
+        server.reset();
     }
 
     @Test
@@ -99,6 +102,9 @@ class EmployeeClientTest {
         // Then
         Assertions.assertNotNull(employees);
         Assertions.assertTrue(employees.isEmpty());
+
+        server.verify();
+        server.reset();
     }
 
     @Test
@@ -117,6 +123,8 @@ class EmployeeClientTest {
         Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
 
         // Then
+        server.verify();
+        server.reset();
     }
 
     @Test
@@ -136,6 +144,8 @@ class EmployeeClientTest {
         Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
 
         // Then
+        server.verify();
+        server.reset();
     }
 
     @Test
@@ -150,6 +160,8 @@ class EmployeeClientTest {
         Assertions.assertThrows(EmployeeNotFoundException.class, () -> client.getById(id));
 
         // Then
+        server.verify();
+        server.reset();
     }
 
     @Test
@@ -186,6 +198,8 @@ class EmployeeClientTest {
                 () -> Assertions.assertEquals("billBob@company.com", result.getEmail())
         );
 
+        server.verify();
+        server.reset();
     }
 
     @Test
@@ -204,6 +218,9 @@ class EmployeeClientTest {
 
         // Then
         Assertions.assertEquals(Duration.ofSeconds(10), exception.getRetryAfter());
+
+        server.verify();
+        server.reset();
     }
 
     @Nested
@@ -225,6 +242,7 @@ class EmployeeClientTest {
 
             // Then
             server.verify();
+            server.reset();
         }
 
 
@@ -252,8 +270,6 @@ class EmployeeClientTest {
                         """))
                     .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
 
-        // When
-        var result = client.create(employeeInput);
             // When
             var result = client.create(employeeInput);
 
@@ -270,6 +286,7 @@ class EmployeeClientTest {
             );
 
             server.verify();
+            server.reset();
         }
 
         @Test
@@ -290,6 +307,7 @@ class EmployeeClientTest {
 
             // Then
             server.verify();
+            server.reset();
         }
 
         @Test
@@ -308,13 +326,10 @@ class EmployeeClientTest {
             // When
             Assertions.assertThrows(BadGatewayException.class, () -> client.create(employeeInput));
 
-        // Then
-        server.verify();
-    }
             // Then
             server.verify();
+            server.reset();
         }
-
     }
 
 
