@@ -2,6 +2,7 @@ package com.reliaquest.api.controller;
 
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.service.EmployeeService;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,34 @@ class EmployeeControllerTest {
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
+
+        // Then
+        Mockito.verify(service).findAll();
+        Mockito.verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void getAllEmployees_whenEmployeesExist_returnsListOfEmployees() throws Exception {
+        // Given
+        var employees = List.of(
+                new Employee(UUID.randomUUID(), "N1", 1, 20, "T1", "e1@c"),
+                new Employee(UUID.randomUUID(), "N2", 1, 20, "T2", "e2@c"),
+                new Employee(UUID.randomUUID(), "N3", 1, 20, "T3", "e3@c"),
+                new Employee(UUID.randomUUID(), "N4", 1, 20, "T4", "e4@c"),
+                new Employee(UUID.randomUUID(), "N5", 1, 20, "T5", "e5@c")
+        );
+        Mockito.when(service.findAll()).thenReturn(employees);
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.jsonPath("$", Matchers.hasSize(5)))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].name").value("N1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].salary").value("1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].age").value("20"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("T1"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$[0].email").value("e1@c"));
 
         // Then
         Mockito.verify(service).findAll();
