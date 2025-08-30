@@ -616,6 +616,7 @@ class EmployeeServiceTest {
                     () -> Assertions.assertEquals(id, result.getId()),
                     () -> Assertions.assertEquals(email, result.getEmail()));
 
+            Mockito.verify(client).getAll();
             Mockito.verify(client).create(employeeToCreate);
             Mockito.verifyNoMoreInteractions(client);
         }
