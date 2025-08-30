@@ -22,7 +22,7 @@ public class DownstreamErrorHandler extends DefaultResponseErrorHandler {
 
         if (status.value() == 429) {
             Duration retryAfter = parseRetryAfter(response.getHeaders().getFirst(HttpHeaders.RETRY_AFTER));
-            throw new DownstreamUnavailableException("rate limited. Retry after: " + retryAfter);
+            throw new DownstreamUnavailableException("rate limited", retryAfter);
         }
 
         if (status.is5xxServerError()) {
