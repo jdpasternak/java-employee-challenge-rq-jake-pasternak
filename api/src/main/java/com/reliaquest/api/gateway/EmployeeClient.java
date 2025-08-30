@@ -8,6 +8,7 @@ import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -50,7 +51,21 @@ public class EmployeeClient implements IEmployeeClient {
     }
 
     public Employee create(CreateEmployeeInput in) {
-        return null;
+        var type = new ParameterizedTypeReference<Envelope<WireEmployee>>() {
+        };
+        var requestWire = EmployeeMapper.toWire(in);
+        var entity = new HttpEntity<>(requestWire);
+        var response = restTemplate.exchange(
+                "/employee",
+                HttpMethod.POST,
+                entity,
+                type);
+
+        var responseWire = Optional.ofNullable(response.getBody())
+                .map(Envelope::data)
+                .orElse(null);
+
+        return EmployeeMapper.toDomain(responseWire);
     }
 
     public boolean deleteByName(String name) throws EmployeeNotFoundException {
