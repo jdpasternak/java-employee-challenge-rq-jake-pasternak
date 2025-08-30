@@ -1,5 +1,6 @@
 package com.reliaquest.api.controller;
 
+import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.service.EmployeeService;
 import org.hamcrest.Matchers;
@@ -64,6 +65,20 @@ class EmployeeControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].age").value("20"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].title").value("T1"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$[0].email").value("e1@c"));
+
+        // Then
+        Mockito.verify(service).findAll();
+        Mockito.verifyNoMoreInteractions(service);
+    }
+
+    @Test
+    void getAllEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+        // Given
+        Mockito.when(service.findAll()).thenThrow(new DownstreamUnavailableException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
         // Then
         Mockito.verify(service).findAll();
