@@ -2,6 +2,7 @@ package com.reliaquest.api.service;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
+import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
@@ -10,6 +11,8 @@ import jakarta.validation.ConstraintViolationException;
 import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -613,6 +616,65 @@ class EmployeeServiceTest {
                     () -> Assertions.assertEquals(id, result.getId()),
                     () -> Assertions.assertEquals(email, result.getEmail()));
 
+            Mockito.verify(client).create(employeeToCreate);
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"Test McTest", "test mctest"})
+        void createEmployee_whenEmployeeWithSameNameExists_throwsEmployeeWithNameAlreadyExistsException(String candidate) {
+            // Given
+            List<Employee> existingEmployees = List.of(
+                    new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c")
+            );
+            var employeeToCreate = new CreateEmployeeInput(candidate, 2, 25, "Tt");
+            Mockito.when(client.getAll()).thenReturn(existingEmployees);
+
+            // When
+            var exception = Assertions.assertThrows(EmployeeWithNameAlreadyExistsException.class,
+                    () -> employeeService.createEmployee(employeeToCreate));
+
+            // Then
+            Assertions.assertEquals(candidate, exception.getName());
+
+            Mockito.verify(client).getAll();
+            Mockito.verify(client, Mockito.never()).create(Mockito.any());
+            Mockito.verifyNoMoreInteractions(client);
+        }
+
+        @Test
+        void createEmployee_whenEmployeeCreatedWithPartialExistingName_returnsCreatedEmployee() {
+            // Given
+            List<Employee> existingEmployees = List.of(
+                    new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c")
+            );
+            String name = "Test McTe"; // partial contains
+            int salary = 100;
+            int age = 28;
+            String title = "Lead Tester";
+            String email = "testlead@company.com";
+            UUID id = UUID.randomUUID();
+
+            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput(name, salary, age, title);
+            Employee employeeCreated = new Employee(id, name, salary, age, title, email);
+
+            Mockito.when(client.getAll()).thenReturn(existingEmployees);
+            Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
+
+            // When
+            var result = employeeService.createEmployee(employeeToCreate);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals(name, result.getName()),
+                    () -> Assertions.assertEquals(salary, result.getSalary()),
+                    () -> Assertions.assertEquals(age, result.getAge()),
+                    () -> Assertions.assertEquals(title, result.getTitle()),
+                    () -> Assertions.assertEquals(id, result.getId()),
+                    () -> Assertions.assertEquals(email, result.getEmail()));
+
+            Mockito.verify(client).getAll();
             Mockito.verify(client).create(employeeToCreate);
             Mockito.verifyNoMoreInteractions(client);
         }
