@@ -38,7 +38,15 @@ public class EmployeeClient implements IEmployeeClient {
     }
 
     public Employee getById(UUID id) throws EmployeeNotFoundException {
-        return null;
+        var type = new ParameterizedTypeReference<Envelope<WireEmployee>>() {
+        };
+        var response = restTemplate.exchange("/employee/%s".formatted(id), HttpMethod.GET, null, type);
+
+        var wire = Optional.ofNullable(response.getBody())
+                .map(Envelope::data)
+                .orElse(null);
+
+        return EmployeeMapper.toDomain(wire);
     }
 
     public Employee create(CreateEmployeeInput in) {
