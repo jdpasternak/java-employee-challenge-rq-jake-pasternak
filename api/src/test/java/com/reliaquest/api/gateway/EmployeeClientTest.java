@@ -358,10 +358,31 @@ class EmployeeClientTest {
     }
 
 
-    @Test
-    void deleteByName() {
     @Nested
     class DeleteByNameTests {
+        @Test
+        void deleteByName_whenNoEmployeeExists_returnsFalse() {
+            // Given
+            String nameToDelete = "N";
+            String expectedBody = """
+                    { "data": false,
+                      "status":"Successfully processed request."
+                    }""";
+
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
+                    .andExpect(MockRestRequestMatchers.content().json("""
+                            {"name":"%s"}
+                            """.formatted(nameToDelete)))
+                    .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
+
+            // When
+            Assertions.assertThrows(EmployeeNotFoundException.class, () -> client.deleteByName(nameToDelete));
+
+            // Then
+            server.verify();
+            server.reset();
+        }
     }
 
     @TestConfiguration
