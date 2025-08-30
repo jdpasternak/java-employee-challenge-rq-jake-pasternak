@@ -1,57 +1,51 @@
 package com.reliaquest.api.controller;
 
+import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-import com.reliaquest.api.model.Response;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/employee")
 @RequiredArgsConstructor
-public class EmployeeController implements IEmployeeController {
+public class EmployeeController implements IEmployeeController<Employee, CreateEmployeeInput> {
+
     @Override
-    @GetMapping
-    public ResponseEntity<Response<List>> getAllEmployees() {
-        return ResponseEntity.ok(Response.handledWith(List.of("Employee list")));
+    public ResponseEntity<List<Employee>> getAllEmployees() {
+        return null;
     }
 
     @Override
-    @GetMapping("/search/{searchString}")
-    public ResponseEntity<Response<List>> getEmployeesByNameSearch(@PathVariable String searchString) {
-        return ResponseEntity.ok(Response.handledWith(List.of(searchString)));
+    public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
+        return null;
     }
 
     @Override
-    @GetMapping("/{id}")
-    public ResponseEntity<Response<Employee>> getEmployeeById(@PathVariable String id) {
-        Employee employee = new Employee();
-        employee.setId(id);
-        return ResponseEntity.ok(Response.handledWith(employee));
+    public ResponseEntity<Employee> getEmployeeById(String id) {
+        return null;
     }
 
     @Override
-    @GetMapping("/highestSalary")
-    public ResponseEntity<Response<Integer>> getHighestSalaryOfEmployees() {
-        return ResponseEntity.ok(Response.handledWith(1));
+    public ResponseEntity<Integer> getHighestSalaryOfEmployees() {
+        return null;
     }
 
     @Override
-    @GetMapping("/topTenHighestEarningEmployeeNames")
-    public ResponseEntity<Response<List<String>>> getTopTenHighestEarningEmployeeNames() {
-        return ResponseEntity.ok(Response.handledWith(List.of("Name1")));
+    public ResponseEntity<List<String>> getTopTenHighestEarningEmployeeNames() {
+        return null;
     }
 
     @Override
-    @PostMapping()
-    public ResponseEntity<Response<Employee>> createEmployee(Object employeeInput) { // TODO map this object to CreateEmployeeInput
-        return ResponseEntity.ok(Response.handledWith(new Employee()));
+    public ResponseEntity<Employee> createEmployee(CreateEmployeeInput employeeInput) {
+        return null;
     }
 
     @Override
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Response<String>> deleteEmployeeById(@PathVariable String id) {
-        return ResponseEntity.ok(Response.handledWith(id));
+    public ResponseEntity<String> deleteEmployeeById(String id) {
+        return null;
     }
 }
