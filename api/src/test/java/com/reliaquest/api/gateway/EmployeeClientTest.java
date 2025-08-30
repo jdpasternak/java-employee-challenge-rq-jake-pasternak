@@ -330,6 +330,30 @@ class EmployeeClientTest {
             server.verify();
             server.reset();
         }
+
+
+        @Test
+        void create_whenTooManyRequests_noRetry() {
+            // Given
+            var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+            var httpHeaders = new HttpHeaders();
+            httpHeaders.set(HttpHeaders.RETRY_AFTER, "10");
+
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                    .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(MockRestRequestMatchers.content().json("""
+                        {"name":"N","salary":1,"age":20,"title":"T"}
+                        """))
+                    .andRespond(MockRestResponseCreators.withStatus(HttpStatus.TOO_MANY_REQUESTS).headers(httpHeaders));
+
+            // When
+            Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
+
+            // Then
+            server.verify();
+            server.reset();
+        }
     }
 
 
