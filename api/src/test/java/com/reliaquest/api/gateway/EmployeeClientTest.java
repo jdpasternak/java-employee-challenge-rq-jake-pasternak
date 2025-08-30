@@ -383,6 +383,31 @@ class EmployeeClientTest {
             server.verify();
             server.reset();
         }
+
+        @Test
+        void deleteByName_whenEmployeeExists_returnsTrue() {
+            // Given
+            String nameToDelete = "N";
+            String expectedBody = """
+                    { "data": true,
+                      "status":"Successfully processed request."
+                    }""";
+
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
+                    .andExpect(MockRestRequestMatchers.content().json("""
+                            {"name":"%s"}
+                            """.formatted(nameToDelete)))
+                    .andRespond(MockRestResponseCreators.withSuccess(expectedBody, MediaType.APPLICATION_JSON));
+
+            // When
+            boolean result = client.deleteByName(nameToDelete);
+
+            // Then
+            Assertions.assertTrue(result);
+            server.verify();
+            server.reset();
+        }
     }
 
     @TestConfiguration
