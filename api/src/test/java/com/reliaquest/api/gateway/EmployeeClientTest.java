@@ -7,9 +7,6 @@ import com.reliaquest.api.http.RestClientConfig;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import jakarta.validation.ConstraintViolationException;
-import java.time.Duration;
-import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -27,6 +24,11 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
+
+import java.net.ConnectException;
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
 
 @RestClientTest(EmployeeClient.class)
 @Import({RestClientConfig.class, EmployeeClientTest.MethodValidationConfiguration.class})
@@ -155,6 +157,21 @@ class EmployeeClientTest {
     }
 
     @Test
+    void getAll_whenConnectionRefused_throwsDownstreamUnavailableException() {
+        // Given
+        server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withException(new ConnectException("Connection refused")));
+
+        // When
+        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getAll());
+
+        // Then
+        server.verify();
+        server.reset();
+    }
+
+    @Test
     void getById_whenNotFound_throwsEmployeeNotFoundException() {
         // Given
         UUID id = UUID.randomUUID();
@@ -227,6 +244,22 @@ class EmployeeClientTest {
         // Then
         Assertions.assertEquals(Duration.ofSeconds(10), exception.getRetryAfter());
 
+        server.verify();
+        server.reset();
+    }
+
+    @Test
+    void getById_whenConnectionRefused_throwsDownstreamUnavailableException() {
+        // Given
+        UUID id = UUID.randomUUID();
+        server.expect(MockRestRequestMatchers.requestTo("/employee/%s".formatted(id)))
+                .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+                .andRespond(MockRestResponseCreators.withException(new ConnectException("Connection refused")));
+
+        // When
+        Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.getById(id));
+
+        // Then
         server.verify();
         server.reset();
     }
@@ -379,6 +412,28 @@ class EmployeeClientTest {
             server.verify();
             server.reset();
         }
+        @Test
+        void create_whenConnectionRefused_throwsDownstreamUnavailableException() {
+            // Given
+            var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.POST))
+                    .andExpect(MockRestRequestMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                    .andExpect(
+                            MockRestRequestMatchers.content()
+                                    .json(
+                                            """
+                                                    {"name":"N","salary":1,"age":20,"title":"T"}
+                                                    """))
+                    .andRespond(MockRestResponseCreators.withException(new ConnectException("Connection refused")));
+
+            // When
+            Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.create(employeeInput));
+
+            // Then
+            server.verify();
+            server.reset();
+        }
     }
 
     @Nested
@@ -477,6 +532,28 @@ class EmployeeClientTest {
 
             // When
             Assertions.assertThrows(BadGatewayException.class, () -> client.deleteByName(nameToDelete));
+
+            // Then
+            server.verify();
+            server.reset();
+        }
+
+        @Test
+        void delete_whenConnectionRefused_throwsDownstreamUnavailableException() {
+            // Given
+            String nameToDelete = "N";
+
+            server.expect(MockRestRequestMatchers.requestTo("/employee"))
+                    .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
+                    .andExpect(MockRestRequestMatchers.content()
+                            .json("""
+                                    {"name":"%s"}
+                                    """
+                                    .formatted(nameToDelete)))
+                    .andRespond(MockRestResponseCreators.withException(new ConnectException("Connection refused")));
+
+            // When
+            Assertions.assertThrows(DownstreamUnavailableException.class, () -> client.deleteByName(nameToDelete));
 
             // Then
             server.verify();
