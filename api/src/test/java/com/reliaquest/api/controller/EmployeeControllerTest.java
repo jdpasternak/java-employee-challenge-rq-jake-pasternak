@@ -8,6 +8,7 @@ import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
 import jakarta.validation.ConstraintViolationException;
+import java.util.*;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -19,8 +20,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-
-import java.util.*;
 
 @WebMvcTest(controllers = EmployeeController.class)
 @Import(EmployeeControllerAdvice.class)
@@ -54,8 +53,7 @@ class EmployeeControllerTest {
                 new Employee(UUID.randomUUID(), "N2", 1, 20, "T2", "e2@c"),
                 new Employee(UUID.randomUUID(), "N3", 1, 20, "T3", "e3@c"),
                 new Employee(UUID.randomUUID(), "N4", 1, 20, "T4", "e4@c"),
-                new Employee(UUID.randomUUID(), "N5", 1, 20, "T5", "e5@c")
-        );
+                new Employee(UUID.randomUUID(), "N5", 1, 20, "T5", "e5@c"));
         Mockito.when(service.findAll()).thenReturn(employees);
 
         // When
@@ -110,11 +108,12 @@ class EmployeeControllerTest {
         var searchInput = new SearchInput("bob");
         UUID idB = UUID.randomUUID();
         UUID idJ = UUID.randomUUID();
-        Mockito.when(service.search(searchInput)).thenReturn(List.of(
-                new Employee(idB, "Bob Bobster",1, 20, "T", "eb@c"),
-                new Employee(idJ, "Jane Bobster",1, 20, "T", "ej@c")
-        ));
-        var expectedBody = """
+        Mockito.when(service.search(searchInput))
+                .thenReturn(List.of(
+                        new Employee(idB, "Bob Bobster", 1, 20, "T", "eb@c"),
+                        new Employee(idJ, "Jane Bobster", 1, 20, "T", "ej@c")));
+        var expectedBody =
+                """
                 [
                     {
                         "id":"%s",
@@ -133,7 +132,8 @@ class EmployeeControllerTest {
                         "email":"ej@c"
                     }
                 ]
-                """.formatted(idB, idJ);
+                """
+                        .formatted(idB, idJ);
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
@@ -145,8 +145,10 @@ class EmployeeControllerTest {
         Mockito.verify(service).search(searchInput);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
-    void getEmployeesByNameSearch_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    void getEmployeesByNameSearch_whenServiceThrowsDownstreamUnavailableException_returnsServerError()
+            throws Exception {
         // Given
         var searchInput = new SearchInput("bob");
         Mockito.when(service.search(searchInput)).thenThrow(new DownstreamUnavailableException());
@@ -159,11 +161,13 @@ class EmployeeControllerTest {
         Mockito.verify(service).search(searchInput);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void getEmployeesByNameSearch_whenSearchStringEmpty_returnsStatusBadRequest() throws Exception {
         // Given
         var searchInput = new SearchInput(" ");
-        Mockito.when(service.search(searchInput)).thenThrow(new ConstraintViolationException("invalid search string", Set.of()));
+        Mockito.when(service.search(searchInput))
+                .thenThrow(new ConstraintViolationException("invalid search string", Set.of()));
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
@@ -195,7 +199,8 @@ class EmployeeControllerTest {
         // Given
         var id = UUID.randomUUID();
         Mockito.when(service.findById(id)).thenReturn(new Employee(id, "N", 1, 20, "T", "e@c"));
-        var expectedBody = """
+        var expectedBody =
+                """
                 {
                     "id": "%s",
                     "name": "N",
@@ -204,7 +209,8 @@ class EmployeeControllerTest {
                     "title":"T",
                     "email":"e@c"
                 }
-                """.formatted(id);
+                """
+                        .formatted(id);
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
@@ -261,6 +267,7 @@ class EmployeeControllerTest {
         Mockito.verify(service).findHighestSalaryOfEmployees();
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void getHighestSalaryOfEmployees_whenData_returnsInteger() throws Exception {
         // Given
@@ -275,8 +282,10 @@ class EmployeeControllerTest {
         Mockito.verify(service).findHighestSalaryOfEmployees();
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
-    void getHighestSalaryOfEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    void getHighestSalaryOfEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServerError()
+            throws Exception {
         // Given
         Mockito.when(service.findHighestSalaryOfEmployees()).thenThrow(new DownstreamUnavailableException());
 
@@ -304,23 +313,17 @@ class EmployeeControllerTest {
         Mockito.verify(service).findTopTenHighestEarningEmployees();
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void getTopTenHighestEarningEmployeeNames_whenData_returnsEmployeeList() throws Exception {
         // Given
-        Mockito.when(service.findTopTenHighestEarningEmployees()).thenReturn(List.of(
-                "Name 1",
-                "Name 2",
-                "Name 3",
-                "Name 4",
-                "Name 5",
-                "Name 6",
-                "Name 7",
-                "Name 8",
-                "Name 9",
-                "Name 10"
-        ));
+        Mockito.when(service.findTopTenHighestEarningEmployees())
+                .thenReturn(List.of(
+                        "Name 1", "Name 2", "Name 3", "Name 4", "Name 5", "Name 6", "Name 7", "Name 8", "Name 9",
+                        "Name 10"));
 
-        var expectedBody = """
+        var expectedBody =
+                """
                 [
                     "Name 1",
                     "Name 2",
@@ -345,8 +348,10 @@ class EmployeeControllerTest {
         Mockito.verify(service).findTopTenHighestEarningEmployees();
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
-    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServerError()
+            throws Exception {
         // Given
         Mockito.when(service.findTopTenHighestEarningEmployees()).thenThrow(new DownstreamUnavailableException());
 
@@ -367,14 +372,16 @@ class EmployeeControllerTest {
         var id = UUID.randomUUID();
         var employeeCreated = new Employee(id, "N", 1, 20, "T", "e@c");
         Mockito.when(service.createEmployee(employeeInput)).thenReturn(employeeCreated);
-        var body = """
+        var body =
+                """
                 {
                 "name":"N",
                 "salary":1,
                 "age":20,
                 "title":"T"
                 }""";
-        var expectedBody = """
+        var expectedBody =
+                """
                 {
                     "id":"%s",
                     "name":"N",
@@ -383,7 +390,8 @@ class EmployeeControllerTest {
                     "title":"T",
                     "email":"e@c"
                 }
-                """.formatted(id);
+                """
+                        .formatted(id);
 
         // When
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
@@ -397,23 +405,24 @@ class EmployeeControllerTest {
         Mockito.verify(service).createEmployee(employeeInput);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void createEmployee_whenInvalidInput_returnsStatusBadRequest() throws Exception {
         // Given
         var employeeInput = new CreateEmployeeInput(" ", 1, 20, "T");
-        var body = """
+        var body =
+                """
                 {
                 "name":" ",
                 "salary":1,
                 "age":20,
                 "title":"T"
                 }""";
-        Mockito.when(service.createEmployee(employeeInput)).thenThrow(
-                new ConstraintViolationException("constraint violation", Set.of()));
+        Mockito.when(service.createEmployee(employeeInput))
+                .thenThrow(new ConstraintViolationException("constraint violation", Set.of()));
 
         // When
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/api/v1/employee")
+        mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -423,23 +432,23 @@ class EmployeeControllerTest {
         Mockito.verify(service).createEmployee(employeeInput);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void createEmployee_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
         // Given
         var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
-        var body = """
+        var body =
+                """
                 {
                 "name":"N",
                 "salary":1,
                 "age":20,
                 "title":"T"
                 }""";
-        Mockito.when(service.createEmployee(employeeInput)).thenThrow(
-                new DownstreamUnavailableException());
+        Mockito.when(service.createEmployee(employeeInput)).thenThrow(new DownstreamUnavailableException());
 
         // When
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/api/v1/employee")
+        mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(MockMvcResultMatchers.status().isInternalServerError())
@@ -449,23 +458,23 @@ class EmployeeControllerTest {
         Mockito.verify(service).createEmployee(employeeInput);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void createEmployee_whenCreateEmployeeWithSameNameAsExistingEmployee_returnsBadRequest() throws Exception {
         // Given
         var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
-        var body = """
+        var body =
+                """
                 {
                 "name":"N",
                 "salary":1,
                 "age":20,
                 "title":"T"
                 }""";
-        Mockito.when(service.createEmployee(employeeInput)).thenThrow(
-                new EmployeeWithNameAlreadyExistsException());
+        Mockito.when(service.createEmployee(employeeInput)).thenThrow(new EmployeeWithNameAlreadyExistsException());
 
         // When
-        mvc.perform(MockMvcRequestBuilders
-                        .post("/api/v1/employee")
+        mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())
@@ -491,6 +500,7 @@ class EmployeeControllerTest {
         Mockito.verify(service).deleteEmployeeById(id);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void deleteEmployeeById_whenEmployeeWithIdExists_returnsEmployeeName() throws Exception {
         // Given
@@ -506,6 +516,7 @@ class EmployeeControllerTest {
         Mockito.verify(service).deleteEmployeeById(id);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
         // Given
@@ -521,6 +532,7 @@ class EmployeeControllerTest {
         Mockito.verify(service).deleteEmployeeById(id);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void deleteEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {
         // Given

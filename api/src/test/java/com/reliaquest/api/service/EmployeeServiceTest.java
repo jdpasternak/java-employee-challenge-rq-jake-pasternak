@@ -420,16 +420,11 @@ class EmployeeServiceTest {
             Assertions.assertNotNull(result);
             Assertions.assertFalse(result.isEmpty());
             Assertions.assertEquals(5, result.size());
-            Assertions.assertEquals(
-                    employeesExpectedOrder.get(0).getName(), result.get(0));
-            Assertions.assertEquals(
-                    employeesExpectedOrder.get(1).getName(), result.get(1));
-            Assertions.assertEquals(
-                    employeesExpectedOrder.get(2).getName(), result.get(2));
-            Assertions.assertEquals(
-                    employeesExpectedOrder.get(3).getName(), result.get(3));
-            Assertions.assertEquals(
-                    employeesExpectedOrder.get(4).getName(), result.get(4));
+            Assertions.assertEquals(employeesExpectedOrder.get(0).getName(), result.get(0));
+            Assertions.assertEquals(employeesExpectedOrder.get(1).getName(), result.get(1));
+            Assertions.assertEquals(employeesExpectedOrder.get(2).getName(), result.get(2));
+            Assertions.assertEquals(employeesExpectedOrder.get(3).getName(), result.get(3));
+            Assertions.assertEquals(employeesExpectedOrder.get(4).getName(), result.get(4));
 
             Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
@@ -620,16 +615,17 @@ class EmployeeServiceTest {
 
         @ParameterizedTest
         @ValueSource(strings = {"Test McTest", "test mctest"})
-        void createEmployee_whenEmployeeWithSameNameExists_throwsEmployeeWithNameAlreadyExistsException(String candidate) {
+        void createEmployee_whenEmployeeWithSameNameExists_throwsEmployeeWithNameAlreadyExistsException(
+                String candidate) {
             // Given
-            List<Employee> existingEmployees = List.of(
-                    new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c")
-            );
+            List<Employee> existingEmployees =
+                    List.of(new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c"));
             var employeeToCreate = new CreateEmployeeInput(candidate, 2, 25, "Tt");
             Mockito.when(client.getAll()).thenReturn(existingEmployees);
 
             // When
-            var exception = Assertions.assertThrows(EmployeeWithNameAlreadyExistsException.class,
+            var exception = Assertions.assertThrows(
+                    EmployeeWithNameAlreadyExistsException.class,
                     () -> employeeService.createEmployee(employeeToCreate));
 
             // Then
@@ -643,9 +639,8 @@ class EmployeeServiceTest {
         @Test
         void createEmployee_whenEmployeeCreatedWithPartialExistingName_returnsCreatedEmployee() {
             // Given
-            List<Employee> existingEmployees = List.of(
-                    new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c")
-            );
+            List<Employee> existingEmployees =
+                    List.of(new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c"));
             String name = "Test McTe"; // partial contains
             int salary = 100;
             int age = 28;

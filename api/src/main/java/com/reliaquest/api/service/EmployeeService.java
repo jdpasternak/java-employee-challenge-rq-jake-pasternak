@@ -59,8 +59,7 @@ public class EmployeeService {
     public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) {
         String employeeName = employeeInput.name();
         List<Employee> employees = client.getAll();
-        if (employees
-                .stream()
+        if (employees.stream()
                 .map(Employee::getName)
                 .map(name -> name.toLowerCase(Locale.ROOT))
                 .anyMatch(employeeName.toLowerCase(Locale.ROOT)::equals)) {

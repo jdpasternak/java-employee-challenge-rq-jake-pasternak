@@ -1,7 +1,10 @@
 package com.reliaquest.api.http;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,14 +15,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.RequestMatcher;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @RestClientTest(EmployeeClient.class)
 @Import(RestClientConfig.class)
@@ -27,6 +24,7 @@ class CorrelationInterceptorTest {
 
     @Autowired
     EmployeeClient client;
+
     @Autowired
     MockRestServiceServer server;
 
@@ -45,9 +43,9 @@ class CorrelationInterceptorTest {
                 .andExpect(MockRestRequestMatchers.header("X-Correlation-Id", "abc123"))
                 .andRespond(MockRestResponseCreators.withSuccess(
                         """
-                                {"data": [{"id":"%s", "employee_name":"N","employee_salary":1,"employee_age":20,"employee_title":"T","employee_email":"e@c"}],"status":"ok"}""".formatted(UUID.randomUUID()),
-                        MediaType.APPLICATION_JSON
-                ));
+                                {"data": [{"id":"%s", "employee_name":"N","employee_salary":1,"employee_age":20,"employee_title":"T","employee_email":"e@c"}],"status":"ok"}"""
+                                .formatted(UUID.randomUUID()),
+                        MediaType.APPLICATION_JSON));
 
         // When
         var result = client.getAll();
@@ -64,7 +62,8 @@ class CorrelationInterceptorTest {
         MDC.put("correlation_id", "def456");
         var id = UUID.randomUUID();
         var employeeToCreate = new CreateEmployeeInput("N", 1, 20, "T");
-        var expectedBody = """
+        var expectedBody =
+                """
                 {
                     "name": "N",
                     "salary": 1,
@@ -81,9 +80,9 @@ class CorrelationInterceptorTest {
                 .andRespond(MockRestResponseCreators.withSuccess(
                         """
                                 {"data": {"id":"%s", "employee_name":"N","employee_salary":1,"employee_age":20,"employee_title":"T","employee_email":"e@c"},
-                                "status":"ok"}""".formatted(id),
-                        MediaType.APPLICATION_JSON
-                ));
+                                "status":"ok"}"""
+                                .formatted(id),
+                        MediaType.APPLICATION_JSON));
 
         // When
         var result = client.create(employeeToCreate);

@@ -22,5 +22,4 @@ public class DownstreamUnavailableException extends RuntimeException {
         super(message);
         this.retryAfter = retryAfter;
     }
-
 }

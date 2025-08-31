@@ -1,5 +1,7 @@
 package com.reliaquest.api.http;
 
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpRequest;
@@ -8,16 +10,14 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.util.concurrent.TimeUnit;
-
 @Slf4j
 @Component
 public class CorrelationInterceptor implements ClientHttpRequestInterceptor {
     private static final String HDR = "X-Correlation-Id";
 
     @Override
-    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution) throws IOException {
+    public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
+            throws IOException {
         String correlationId = MDC.get("correlation_id");
         if (correlationId != null) request.getHeaders().set(HDR, correlationId);
         var t0 = System.nanoTime();

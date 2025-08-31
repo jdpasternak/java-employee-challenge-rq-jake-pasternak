@@ -7,6 +7,10 @@ import com.reliaquest.api.http.RestClientConfig;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import jakarta.validation.ConstraintViolationException;
+import java.net.ConnectException;
+import java.time.Duration;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,11 +28,6 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.validation.beanvalidation.MethodValidationPostProcessor;
-
-import java.net.ConnectException;
-import java.time.Duration;
-import java.util.List;
-import java.util.UUID;
 
 @RestClientTest(EmployeeClient.class)
 @Import({RestClientConfig.class, EmployeeClientTest.MethodValidationConfiguration.class})
@@ -412,6 +411,7 @@ class EmployeeClientTest {
             server.verify();
             server.reset();
         }
+
         @Test
         void create_whenConnectionRefused_throwsDownstreamUnavailableException() {
             // Given
@@ -546,10 +546,11 @@ class EmployeeClientTest {
             server.expect(MockRestRequestMatchers.requestTo("/employee"))
                     .andExpect(MockRestRequestMatchers.method(HttpMethod.DELETE))
                     .andExpect(MockRestRequestMatchers.content()
-                            .json("""
+                            .json(
+                                    """
                                     {"name":"%s"}
                                     """
-                                    .formatted(nameToDelete)))
+                                            .formatted(nameToDelete)))
                     .andRespond(MockRestResponseCreators.withException(new ConnectException("Connection refused")));
 
             // When

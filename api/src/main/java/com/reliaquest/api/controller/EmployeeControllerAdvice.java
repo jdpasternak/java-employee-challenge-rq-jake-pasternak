@@ -21,7 +21,11 @@ public class EmployeeControllerAdvice {
         return ResponseEntity.internalServerError().build();
     }
 
-    @ExceptionHandler({ConstraintViolationException.class, IllegalArgumentException.class, EmployeeWithNameAlreadyExistsException.class})
+    @ExceptionHandler({
+        ConstraintViolationException.class,
+        IllegalArgumentException.class,
+        EmployeeWithNameAlreadyExistsException.class
+    })
     protected ResponseEntity<?> handleInvalidInputExceptions(Throwable ex) {
         log.error("Bad Request!", ex);
         return ResponseEntity.badRequest().build();

@@ -3,9 +3,10 @@ package com.reliaquest.api.http;
 import com.reliaquest.api.controller.EmployeeController;
 import com.reliaquest.api.controller.EmployeeControllerAdvice;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
-import com.reliaquest.api.http.CorrelationFilter;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.service.EmployeeService;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,9 +18,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.List;
-import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class CorrelationFilterTest {
@@ -39,9 +37,7 @@ class CorrelationFilterTest {
     @Test
     void doFilterInternal_whenHeaderMissing_echoesHeader() throws Exception {
         // Given
-        Mockito.when(service.findAll()).thenReturn(List.of(
-                new Employee(UUID.randomUUID(), "N", 1, 20, "T", "e@c")
-        ));
+        Mockito.when(service.findAll()).thenReturn(List.of(new Employee(UUID.randomUUID(), "N", 1, 20, "T", "e@c")));
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
@@ -56,15 +52,12 @@ class CorrelationFilterTest {
         // Then
         Mockito.verify(service).findAll();
         Mockito.verifyNoMoreInteractions(service);
-
     }
 
     @Test
     void doFilterInternal_whenHeaderExists_echoesHeaderUnchanged() throws Exception {
         // Given
-        Mockito.when(service.findAll()).thenReturn(List.of(
-                new Employee(UUID.randomUUID(), "N", 1, 20, "T", "e@c")
-        ));
+        Mockito.when(service.findAll()).thenReturn(List.of(new Employee(UUID.randomUUID(), "N", 1, 20, "T", "e@c")));
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee").header("X-Correlation-Id", "abc123"))
