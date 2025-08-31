@@ -18,10 +18,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 @WebMvcTest(controllers = EmployeeController.class)
 @Import(EmployeeControllerAdvice.class)
@@ -249,11 +246,32 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getHighestSalaryOfEmployees_whenNoData_returnsStatusNoContent() {
+    void getHighestSalaryOfEmployees_whenNoData_returnsStatusNoContent() throws Exception {
+        // Given
+        Mockito.when(service.findHighestSalaryOfEmployees()).thenReturn(OptionalInt.empty());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/highestSalary"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).findHighestSalaryOfEmployees();
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
-    void getHighestSalaryOfEmployees_whenData_returnsInteger() {
+    void getHighestSalaryOfEmployees_whenData_returnsInteger() throws Exception {
+        // Given
+        Mockito.when(service.findHighestSalaryOfEmployees()).thenReturn(OptionalInt.of(100));
 
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/highestSalary"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("100"));
+
+        // Then
+        Mockito.verify(service).findHighestSalaryOfEmployees();
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
     void getHighestSalaryOfEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
