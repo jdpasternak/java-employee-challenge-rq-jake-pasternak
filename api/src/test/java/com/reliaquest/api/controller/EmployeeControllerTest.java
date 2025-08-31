@@ -424,6 +424,29 @@ class EmployeeControllerTest {
     }
     @Test
     void createEmployee_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+        // Given
+        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+        var body = """
+                {
+                "name":"N",
+                "salary":1,
+                "age":20,
+                "title":"T"
+                }""";
+        Mockito.when(service.createEmployee(employeeInput)).thenThrow(
+                new DownstreamUnavailableException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/api/v1/employee")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).createEmployee(employeeInput);
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
     void createEmployee_whenCreateEmployeeWithSameNameAsExistingEmployee_returnsBadRequest() throws Exception {
