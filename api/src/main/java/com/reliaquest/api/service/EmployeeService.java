@@ -73,7 +73,7 @@ public class EmployeeService {
         String name = employeeFound.getName();
         boolean deleted = client.deleteByName(name);
         if (!deleted) {
-            throw new EmployeeNotFoundException();
+            throw new EmployeeNotFoundException(id);
         }
         return name;
     }
