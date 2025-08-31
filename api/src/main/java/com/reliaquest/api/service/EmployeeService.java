@@ -38,8 +38,8 @@ public class EmployeeService {
                 .toList();
     }
 
-    public Employee findById(@NotNull UUID id) {
-        return client.getById(id);
+    public Employee findById(@NotNull @org.hibernate.validator.constraints.UUID String id) {
+        return client.getById(UUID.fromString(id));
     }
 
     public OptionalInt findHighestSalaryOfEmployees() {
@@ -68,8 +68,8 @@ public class EmployeeService {
         return client.create(employeeInput);
     }
 
-    public String deleteEmployeeById(@NotNull UUID id) throws EmployeeNotFoundException {
-        Employee employeeFound = client.getById(id);
+    public String deleteEmployeeById(@NotNull @org.hibernate.validator.constraints.UUID String id) throws EmployeeNotFoundException {
+        Employee employeeFound = client.getById(UUID.fromString(id));
         String name = employeeFound.getName();
         boolean deleted = client.deleteByName(name);
         if (!deleted) {
