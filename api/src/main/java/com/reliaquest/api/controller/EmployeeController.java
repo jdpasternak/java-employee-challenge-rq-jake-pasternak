@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/v1/employee")
@@ -42,7 +43,7 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<Employee> getEmployeeById(String id) {
-        return null;
+        return ResponseEntity.ok(employeeService.findById(UUID.fromString(id)));
     }
 
     @Override
