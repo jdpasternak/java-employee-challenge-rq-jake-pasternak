@@ -249,7 +249,25 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getHighestSalaryOfEmployees() {
+    void getHighestSalaryOfEmployees_whenNoData_returnsStatusNoContent() {
+    }
+    @Test
+    void getHighestSalaryOfEmployees_whenData_returnsInteger() {
+
+    }
+    @Test
+    void getHighestSalaryOfEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+        // Given
+        Mockito.when(service.findHighestSalaryOfEmployees()).thenThrow(new DownstreamUnavailableException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/highestSalary"))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).findHighestSalaryOfEmployees();
+        Mockito.verifyNoMoreInteractions(service);
     }
 
     @Test
