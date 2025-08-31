@@ -1,7 +1,6 @@
 package com.reliaquest.api.gateway;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
-import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.http.EmployeeMapper;
 import com.reliaquest.api.http.Envelope;
 import com.reliaquest.api.http.WireEmployee;
@@ -42,7 +41,7 @@ public class EmployeeClient implements IEmployeeClient {
         });
     }
 
-    public Employee getById(UUID id) throws EmployeeNotFoundException {
+    public Employee getById(UUID id) {
         return ioSafe(() -> {
             var type = new ParameterizedTypeReference<Envelope<WireEmployee>>() {};
             var response = restTemplate.exchange("/employee/%s".formatted(id), HttpMethod.GET, null, type);
@@ -68,7 +67,7 @@ public class EmployeeClient implements IEmployeeClient {
         });
     }
 
-    public boolean deleteByName(String name) throws EmployeeNotFoundException {
+    public boolean deleteByName(String name) {
         return ioSafe(() -> {
             var type = new ParameterizedTypeReference<Envelope<Boolean>>() {};
             var body = Map.of("name", name);
