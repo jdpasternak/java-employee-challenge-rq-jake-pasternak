@@ -193,6 +193,29 @@ class EmployeeControllerTest {
 
     @Test
     void getEmployeeById_whenEmployeeMatches_returnsEmployee() throws Exception {
+        // Given
+        var id = UUID.randomUUID();
+        Mockito.when(service.findById(id)).thenReturn(new Employee(id, "N", 1, 20, "T", "e@c"));
+        var expectedBody = """
+                {
+                    "id": "%s",
+                    "name": "N",
+                    "salary": 1,
+                    "age": 20,
+                    "title":"T",
+                    "email":"e@c"
+                }
+                """.formatted(id);
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(expectedBody));
+
+        // Then
+        Mockito.verify(service).findById(id);
+        Mockito.verifyNoMoreInteractions(service);
     }
 
     @Test
