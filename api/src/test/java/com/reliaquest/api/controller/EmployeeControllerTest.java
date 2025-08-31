@@ -477,6 +477,11 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void deleteEmployeeById() {
-    }
+    void deleteEmployeeById_whenNoEmployeeWithIdExists_returnStatusNotFound() throws Exception {}
+    @Test
+    void deleteEmployeeById_whenEmployeeWithIdExists_returnsEmployeeName() throws Exception {}
+    @Test
+    void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {}
+    @Test
+    void deleteEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {}
 }
