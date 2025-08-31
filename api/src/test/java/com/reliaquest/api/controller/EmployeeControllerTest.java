@@ -4,6 +4,7 @@ import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
+import jakarta.validation.ConstraintViolationException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -18,6 +19,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 @WebMvcTest(controllers = EmployeeController.class)
@@ -158,7 +160,19 @@ class EmployeeControllerTest {
         Mockito.verifyNoMoreInteractions(service);
     }
     @Test
-    void getEmployeesByNameSearch_whenSearchStringEmpty_returnsStatusBadRequest() {}
+    void getEmployeesByNameSearch_whenSearchStringEmpty_returnsStatusBadRequest() throws Exception {
+        // Given
+        var searchInput = new SearchInput(" ");
+        Mockito.when(service.search(searchInput)).thenThrow(new ConstraintViolationException("invalid search string", Set.of()));
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
+
+        // Then
+        Mockito.verify(service).search(searchInput);
+        Mockito.verifyNoMoreInteractions(service);
+    }
 
     @Test
     void getEmployeeById() {
