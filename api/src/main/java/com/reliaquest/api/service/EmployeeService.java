@@ -47,11 +47,12 @@ public class EmployeeService {
         return employees.stream().mapToInt(Employee::getSalary).max();
     }
 
-    public List<Employee> findTopTenHighestEarningEmployees() {
+    public List<String> findTopTenHighestEarningEmployees() {
         List<Employee> employees = client.getAll();
         return employees.stream()
                 .sorted(EmployeeComparators.BY_SALARY_DESC_NAME_ASC_ID_ASC)
                 .limit(10)
+                .map(Employee::getName)
                 .toList();
     }
 
