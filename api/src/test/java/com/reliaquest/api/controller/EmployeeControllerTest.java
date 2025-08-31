@@ -359,7 +359,16 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void createEmployee() {
+    void createEmployee_whenValidInput_returnsCreatedEmployee() throws Exception {
+    }
+    @Test
+    void createEmployee_whenInvalidInput_returnsStatusBadRequest() throws Exception {
+    }
+    @Test
+    void createEmployee_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    }
+    @Test
+    void createEmployee_whenCreateEmployeeWithSameNameAsExistingEmployee_returnsBadRequest() throws Exception {
     }
 
     @Test
