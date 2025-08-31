@@ -34,7 +34,7 @@ class DownstreamErrorHandlerTest {
         var resp = new MockClientHttpResponse(new byte[0], HttpStatus.NOT_FOUND);
 
         // When
-        Assertions.assertThrows(EmployeeNotFoundException.class, () -> downstreamErrorHandler.handleError(resp));
+        var exception = Assertions.assertThrows(EmployeeNotFoundException.class, () -> downstreamErrorHandler.handleError(URI.create("/api/v1/employee/%s".formatted(id)), null, resp));
 
         // Then
     }
@@ -47,7 +47,7 @@ class DownstreamErrorHandlerTest {
 
         // When
         var ex = Assertions.assertThrows(
-                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
+                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         // Then
         Assertions.assertEquals(Duration.ofSeconds(2), ex.getRetryAfter());
@@ -63,7 +63,7 @@ class DownstreamErrorHandlerTest {
 
         // When
         var ex = Assertions.assertThrows(
-                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
+                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         // Then
         Assertions.assertNull(ex.getRetryAfter());
@@ -78,7 +78,7 @@ class DownstreamErrorHandlerTest {
 
         // When
         Assertions.assertThrows(
-                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(response));
+                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         // Then
 
@@ -93,7 +93,7 @@ class DownstreamErrorHandlerTest {
         // When
 
         // Then
-        Assertions.assertThrows(BadGatewayException.class, () -> downstreamErrorHandler.handleError(response));
+        Assertions.assertThrows(BadGatewayException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         response.close();
     }
