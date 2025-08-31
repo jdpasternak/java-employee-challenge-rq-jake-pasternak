@@ -309,7 +309,7 @@ class EmployeeServiceTest {
         @Test
         void findById_whenUuidIsNull_throwsConstraintViolationException() {
             // Given
-            UUID nonUuid = null;
+            String nonUuid = null;
 
             // When
 
@@ -321,34 +321,36 @@ class EmployeeServiceTest {
         @Test
         void findById_whenExists_returnsEmployee() {
             // Given
-            UUID id = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042");
+            var id = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            var uuid = UUID.fromString(id);
             String name = "Sharda Gibson";
-            Mockito.when(client.getById(Mockito.eq(id))).thenReturn(testEmployees.get(0));
+            Mockito.when(client.getById(Mockito.eq(uuid))).thenReturn(testEmployees.get(0));
 
             // When
             Employee result = employeeService.findById(id);
 
             // Then
             Assertions.assertNotNull(result);
-            Assertions.assertEquals(id, result.getId());
+            Assertions.assertEquals(id, result.getId().toString());
             Assertions.assertEquals(name, result.getName());
 
-            Mockito.verify(client).getById(id);
+            Mockito.verify(client).getById(uuid);
             Mockito.verifyNoMoreInteractions(client);
         }
 
         @Test
         void findById_whenNoEmployeeExists_throwEmployeeNotFoundException() {
             // Given
-            UUID id = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc4104f");
-            Mockito.when(client.getById(Mockito.eq(id))).thenThrow(new EmployeeNotFoundException());
+            var id = "99eff840-bc7d-4a3e-b9c8-b46bbcc4104f";
+            var uuid = UUID.fromString(id);
+            Mockito.when(client.getById(Mockito.eq(uuid))).thenThrow(new EmployeeNotFoundException());
 
             // When
 
             // Then
             Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.findById(id));
 
-            Mockito.verify(client).getById(id);
+            Mockito.verify(client).getById(uuid);
             Mockito.verifyNoMoreInteractions(client);
         }
     }
@@ -685,7 +687,7 @@ class EmployeeServiceTest {
         @Test
         void deleteEmployeeById_whenIdInputIsNull_throwsConstraintViolationException() {
             // Given
-            UUID id = null;
+            String id = null;
 
             // When
             Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.deleteEmployeeById(id));
@@ -697,23 +699,25 @@ class EmployeeServiceTest {
         @Test
         void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
             // Given
-            UUID id = UUID.fromString("89eff840-bc7d-4a3e-b9c8-b46bbcc41043"); // Does not exist
-            Mockito.when(client.getById(id)).thenThrow(new EmployeeNotFoundException());
+            var id = "89eff840-bc7d-4a3e-b9c8-b46bbcc41043";
+            var uuid = UUID.fromString(id);
+            Mockito.when(client.getById(uuid)).thenThrow(new EmployeeNotFoundException());
 
             // When
             Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
 
             // Then
-            Mockito.verify(client).getById(id);
+            Mockito.verify(client).getById(uuid);
             Mockito.verifyNoMoreInteractions(client);
         }
 
         @Test
         void deleteEmployeeById_whenNameResolves_deletesByName_returnsEmployeeName() throws EmployeeNotFoundException {
             // Given
-            UUID idToDelete = UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042");
+            var idToDelete = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            UUID uuidToDelete = UUID.fromString(idToDelete);
             String nameToDelete = "Sharda Gibson";
-            Mockito.when(client.getById(idToDelete)).thenReturn(testEmployees.get(0));
+            Mockito.when(client.getById(uuidToDelete)).thenReturn(testEmployees.get(0));
             Mockito.when(client.deleteByName(nameToDelete)).thenReturn(true);
 
             // When
@@ -723,7 +727,7 @@ class EmployeeServiceTest {
             Assertions.assertNotNull(result);
             Assertions.assertEquals(nameToDelete, result);
 
-            Mockito.verify(client).getById(idToDelete);
+            Mockito.verify(client).getById(uuidToDelete);
             Mockito.verify(client).deleteByName(nameToDelete);
             Mockito.verifyNoMoreInteractions(client);
         }
@@ -731,15 +735,16 @@ class EmployeeServiceTest {
         @Test
         void deleteEmployeeById_whenClientReturnsFalse_throwsEmployeeNotFoundException() {
             // Given
-            UUID id = UUID.randomUUID();
-            Mockito.when(client.getById(id)).thenReturn(new Employee(id, "X", 100, 20, "T", "e@c"));
+            var uuid = UUID.randomUUID();
+            var id = UUID.randomUUID().toString();
+            Mockito.when(client.getById(uuid)).thenReturn(new Employee(uuid, "X", 100, 20, "T", "e@c"));
             Mockito.when(client.deleteByName("X")).thenReturn(false);
 
             // When
             Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
 
             // Then
-            Mockito.verify(client).getById(id);
+            Mockito.verify(client).getById(uuid);
             Mockito.verify(client).deleteByName("X");
             Mockito.verifyNoMoreInteractions(client);
         }
