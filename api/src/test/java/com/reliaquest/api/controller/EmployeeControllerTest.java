@@ -197,8 +197,6 @@ class EmployeeControllerTest {
     @Test
     void getEmployeeById_whenEmployeeMatches_returnsEmployee() throws Exception {
         // Given
-        var id = UUID.randomUUID();
-        Mockito.when(service.findById(id)).thenReturn(new Employee(id, "N", 1, 20, "T", "e@c"));
         var uuid = UUID.randomUUID();
         var id = uuid.toString();
         Mockito.when(service.findById(id)).thenReturn(new Employee(uuid, "N", 1, 20, "T", "e@c"));
