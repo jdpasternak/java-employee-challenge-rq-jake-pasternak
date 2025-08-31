@@ -380,14 +380,14 @@ class EmployeeControllerTest {
                     "salary":1,
                     "age":20,
                     "title":"T",
-                    "email":"e@c",
+                    "email":"e@c"
                 }
                 """.formatted(id);
 
         // When
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .contentType(body))
+                        .content(body))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(expectedBody));
