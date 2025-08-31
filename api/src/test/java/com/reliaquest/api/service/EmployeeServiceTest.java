@@ -395,7 +395,7 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(new ArrayList<>());
 
             // When
-            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
 
             // Then
             Assertions.assertNotNull(result);
@@ -414,22 +414,22 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(employees);
 
             // When
-            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
 
             // Then
             Assertions.assertNotNull(result);
             Assertions.assertFalse(result.isEmpty());
             Assertions.assertEquals(5, result.size());
             Assertions.assertEquals(
-                    employeesExpectedOrder.get(0).getSalary(), result.get(0).getSalary());
+                    employeesExpectedOrder.get(0).getName(), result.get(0));
             Assertions.assertEquals(
-                    employeesExpectedOrder.get(1).getSalary(), result.get(1).getSalary());
+                    employeesExpectedOrder.get(1).getName(), result.get(1));
             Assertions.assertEquals(
-                    employeesExpectedOrder.get(2).getSalary(), result.get(2).getSalary());
+                    employeesExpectedOrder.get(2).getName(), result.get(2));
             Assertions.assertEquals(
-                    employeesExpectedOrder.get(3).getSalary(), result.get(3).getSalary());
+                    employeesExpectedOrder.get(3).getName(), result.get(3));
             Assertions.assertEquals(
-                    employeesExpectedOrder.get(4).getSalary(), result.get(4).getSalary());
+                    employeesExpectedOrder.get(4).getName(), result.get(4));
 
             Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
@@ -454,23 +454,23 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(employees);
 
             // When
-            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
 
             // Then
             Assertions.assertNotNull(result);
             Assertions.assertFalse(result.isEmpty());
             Assertions.assertEquals(10, result.size());
             Assertions.assertAll(
-                    () -> Assertions.assertEquals(1100, result.get(0).getSalary()),
-                    () -> Assertions.assertEquals(1000, result.get(1).getSalary()),
-                    () -> Assertions.assertEquals(900, result.get(2).getSalary()),
-                    () -> Assertions.assertEquals(800, result.get(3).getSalary()),
-                    () -> Assertions.assertEquals(700, result.get(4).getSalary()),
-                    () -> Assertions.assertEquals(600, result.get(5).getSalary()),
-                    () -> Assertions.assertEquals(500, result.get(6).getSalary()),
-                    () -> Assertions.assertEquals(400, result.get(7).getSalary()),
-                    () -> Assertions.assertEquals(300, result.get(8).getSalary()),
-                    () -> Assertions.assertEquals(200, result.get(9).getSalary()));
+                    () -> Assertions.assertEquals("Employee 11", result.get(0)),
+                    () -> Assertions.assertEquals("Employee 10", result.get(1)),
+                    () -> Assertions.assertEquals("Employee 9", result.get(2)),
+                    () -> Assertions.assertEquals("Employee 8", result.get(3)),
+                    () -> Assertions.assertEquals("Employee 7", result.get(4)),
+                    () -> Assertions.assertEquals("Employee 6", result.get(5)),
+                    () -> Assertions.assertEquals("Employee 5", result.get(6)),
+                    () -> Assertions.assertEquals("Employee 4", result.get(7)),
+                    () -> Assertions.assertEquals("Employee 3", result.get(8)),
+                    () -> Assertions.assertEquals("Employee 2", result.get(9)));
 
             Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
@@ -494,25 +494,23 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(employees);
 
             // When
-            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
 
             // Then
             Assertions.assertNotNull(result);
             Assertions.assertFalse(result.isEmpty());
             Assertions.assertEquals(10, result.size());
             Assertions.assertAll(
-                    () -> Assertions.assertEquals(1100, result.get(0).getSalary()),
-                    () -> Assertions.assertEquals(1000, result.get(1).getSalary()),
-                    () -> Assertions.assertEquals(900, result.get(2).getSalary()),
-                    () -> Assertions.assertEquals(800, result.get(3).getSalary()),
-                    () -> Assertions.assertEquals(600, result.get(4).getSalary()),
-                    () -> Assertions.assertEquals("A Employee 6", result.get(4).getName()),
-                    () -> Assertions.assertEquals(600, result.get(5).getSalary()),
-                    () -> Assertions.assertEquals("B Employee 7", result.get(5).getName()),
-                    () -> Assertions.assertEquals(500, result.get(6).getSalary()),
-                    () -> Assertions.assertEquals(400, result.get(7).getSalary()),
-                    () -> Assertions.assertEquals(300, result.get(8).getSalary()),
-                    () -> Assertions.assertEquals(200, result.get(9).getSalary()));
+                    () -> Assertions.assertEquals("Employee 11", result.get(0)),
+                    () -> Assertions.assertEquals("Employee 10", result.get(1)),
+                    () -> Assertions.assertEquals("Employee 9", result.get(2)),
+                    () -> Assertions.assertEquals("Employee 8", result.get(3)),
+                    () -> Assertions.assertEquals("A Employee 6", result.get(4)),
+                    () -> Assertions.assertEquals("B Employee 7", result.get(5)),
+                    () -> Assertions.assertEquals("Employee 5", result.get(6)),
+                    () -> Assertions.assertEquals("Employee 4", result.get(7)),
+                    () -> Assertions.assertEquals("Employee 3", result.get(8)),
+                    () -> Assertions.assertEquals("Employee 2", result.get(9)));
 
             Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
@@ -536,24 +534,23 @@ class EmployeeServiceTest {
             Mockito.when(client.getAll()).thenReturn(employees);
 
             // When
-            List<Employee> result = employeeService.findTopTenHighestEarningEmployees();
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
 
             // Then
             Assertions.assertNotNull(result);
             Assertions.assertFalse(result.isEmpty());
             Assertions.assertEquals(10, result.size());
             Assertions.assertAll(
-                    () -> Assertions.assertEquals(1100, result.get(0).getSalary()),
-                    () -> Assertions.assertEquals(1000, result.get(1).getSalary()),
-                    () -> Assertions.assertEquals(900, result.get(2).getSalary()),
-                    () -> Assertions.assertEquals(800, result.get(3).getSalary()),
-                    () -> Assertions.assertEquals(700, result.get(4).getSalary()),
-                    () -> Assertions.assertEquals(600, result.get(5).getSalary()),
-                    () -> Assertions.assertEquals(500, result.get(6).getSalary()),
-                    () -> Assertions.assertEquals(400, result.get(7).getSalary()),
-                    () -> Assertions.assertEquals(300, result.get(8).getSalary()),
-                    () -> Assertions.assertEquals(200, result.get(9).getSalary()),
-                    () -> Assertions.assertEquals("A Employee 1", result.get(9).getName()));
+                    () -> Assertions.assertEquals("Employee 11", result.get(0)),
+                    () -> Assertions.assertEquals("Employee 10", result.get(1)),
+                    () -> Assertions.assertEquals("Employee 9", result.get(2)),
+                    () -> Assertions.assertEquals("Employee 8", result.get(3)),
+                    () -> Assertions.assertEquals("Employee 7", result.get(4)),
+                    () -> Assertions.assertEquals("Employee 6", result.get(5)),
+                    () -> Assertions.assertEquals("Employee 5", result.get(6)),
+                    () -> Assertions.assertEquals("Employee 4", result.get(7)),
+                    () -> Assertions.assertEquals("Employee 3", result.get(8)),
+                    () -> Assertions.assertEquals("A Employee 1", result.get(9)));
 
             Mockito.verify(client).getAll();
             Mockito.verifyNoMoreInteractions(client);
