@@ -457,7 +457,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void createEmployee_whenCreateEmployeeWithSameNameAsExistingEmployee_returnsBadRequest() throws Exception {
+    void createEmployee_whenCreateEmployeeWithSameNameAsExistingEmployee_returnsConflict() throws Exception {
         // Given
         var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
         var body =
@@ -474,8 +474,7 @@ class EmployeeControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isConflict());
 
         // Then
         Mockito.verify(service).createEmployee(employeeInput);
