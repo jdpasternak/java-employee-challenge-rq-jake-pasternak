@@ -57,7 +57,11 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<List<String>> getTopTenHighestEarningEmployeeNames() {
-        return null;
+        var employeeNames = employeeService.findTopTenHighestEarningEmployees();
+        if (employeeNames.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(employeeNames);
     }
 
     @Override
