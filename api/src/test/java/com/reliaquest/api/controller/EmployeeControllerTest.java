@@ -2,6 +2,7 @@ package com.reliaquest.api.controller;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
+import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
@@ -450,6 +451,29 @@ class EmployeeControllerTest {
     }
     @Test
     void createEmployee_whenCreateEmployeeWithSameNameAsExistingEmployee_returnsBadRequest() throws Exception {
+        // Given
+        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+        var body = """
+                {
+                "name":"N",
+                "salary":1,
+                "age":20,
+                "title":"T"
+                }""";
+        Mockito.when(service.createEmployee(employeeInput)).thenThrow(
+                new EmployeeWithNameAlreadyExistsException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/api/v1/employee")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).createEmployee(employeeInput);
+        Mockito.verifyNoMoreInteractions(service);
     }
 
     @Test
