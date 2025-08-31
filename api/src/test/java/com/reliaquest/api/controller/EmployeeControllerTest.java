@@ -219,11 +219,33 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() {
+    void getEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+        // Given
+        var id = UUID.randomUUID();
+        Mockito.when(service.findById(id)).thenThrow(new DownstreamUnavailableException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).findById(id);
+        Mockito.verifyNoMoreInteractions(service);
     }
 
     @Test
-    void getEmployeeById_whenBadUuid_returnsStatusBadRequest() {
+    void getEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {
+        // Given
+        var id = "notauuid";
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verifyNoInteractions(service);
     }
 
     @Test
