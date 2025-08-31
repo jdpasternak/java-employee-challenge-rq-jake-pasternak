@@ -71,6 +71,6 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
-        return null;
+        return ResponseEntity.ok(employeeService.deleteEmployeeById(UUID.fromString(id)));
     }
 }
