@@ -2,6 +2,7 @@ package com.reliaquest.api.controller;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
+import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
@@ -360,9 +361,66 @@ class EmployeeControllerTest {
 
     @Test
     void createEmployee_whenValidInput_returnsCreatedEmployee() throws Exception {
+        // Given
+        var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
+        var id = UUID.randomUUID();
+        var employeeCreated = new Employee(id, "N", 1, 20, "T", "e@c");
+        Mockito.when(service.createEmployee(employeeInput)).thenReturn(employeeCreated);
+        var body = """
+                {
+                "name":"N",
+                "salary":1,
+                "age":20,
+                "title":"T"
+                }""";
+        var expectedBody = """
+                {
+                    "id":"%s",
+                    "name":"N",
+                    "salary":1,
+                    "age":20,
+                    "title":"T",
+                    "email":"e@c",
+                }
+                """.formatted(id);
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .contentType(body))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(expectedBody));
+
+        // Then
+        Mockito.verify(service).createEmployee(employeeInput);
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
     void createEmployee_whenInvalidInput_returnsStatusBadRequest() throws Exception {
+        // Given
+        var employeeInput = new CreateEmployeeInput(" ", 1, 20, "T");
+        var body = """
+                {
+                "name":" ",
+                "salary":1,
+                "age":20,
+                "title":"T"
+                }""";
+        Mockito.when(service.createEmployee(employeeInput)).thenThrow(
+                new ConstraintViolationException("constraint violation", Set.of()));
+
+        // When
+        mvc.perform(MockMvcRequestBuilders
+                        .post("/api/v1/employee")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).createEmployee(employeeInput);
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
     void createEmployee_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
