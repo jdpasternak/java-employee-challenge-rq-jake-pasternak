@@ -1,5 +1,6 @@
 package com.reliaquest.api.controller;
 
+import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.model.Response;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,5 +22,11 @@ public class EmployeeControllerAdvice {
     protected ResponseEntity<?> handleConstraintViolationException(Throwable ex) {
         log.error("ConstraintViolationException!", ex);
         return ResponseEntity.badRequest().build();
+    }
+
+    @ExceptionHandler(EmployeeNotFoundException.class)
+    protected ResponseEntity<?> handleEmployeeNotFoundException(Throwable ex) {
+        log.error("EmployeeNotFoundException!", ex);
+        return ResponseEntity.notFound().build();
     }
 }
