@@ -101,12 +101,48 @@ class EmployeeControllerTest {
         Mockito.verify(service).search(searchInput);
         Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
-    void getEmployeesByNameSearch_whenNoMatchingNameExists_returnsStatusNoContent() {}
-    @Test
-    void getEmployeesByNameSearch_whenMatchingNameExists_returnsEmployee() {}
-    @Test
-    void getEmployeesByNameSearch_whenMultipleMatchingNamesExist_returnsListOfEmployees() {}
+    void getEmployeesByNameSearch_whenMatchingNameExists_returnsEmployee() throws Exception {
+        // Given
+        var searchInput = new SearchInput("bob");
+        UUID idB = UUID.randomUUID();
+        UUID idJ = UUID.randomUUID();
+        Mockito.when(service.search(searchInput)).thenReturn(List.of(
+                new Employee(idB, "Bob Bobster",1, 20, "T", "eb@c"),
+                new Employee(idJ, "Jane Bobster",1, 20, "T", "ej@c")
+        ));
+        var expectedBody = """
+                [
+                    {
+                        "id":"%s",
+                        "name":"Bob Bobster",
+                        "salary":1,
+                        "age":20,
+                        "title":"T",
+                        "email":"eb@c"
+                    },
+                    {
+                        "id":"%s",
+                        "name":"Jane Bobster",
+                        "salary":1,
+                        "age":20,
+                        "title":"T",
+                        "email":"ej@c"
+                    }
+                ]
+                """.formatted(idB, idJ);
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(expectedBody));
+
+        // Then
+        Mockito.verify(service).search(searchInput);
+        Mockito.verifyNoMoreInteractions(service);
+    }
     @Test
     void getEmployeesByNameSearch_whenConnectRefused_returnsStatusServerError() {}
     @Test
