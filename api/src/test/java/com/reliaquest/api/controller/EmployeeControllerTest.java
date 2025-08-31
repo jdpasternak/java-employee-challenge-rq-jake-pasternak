@@ -289,8 +289,18 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getTopTenHighestEarningEmployeeNames() {
     void getTopTenHighestEarningEmployeeNames_whenNoData_returnsStatusNoContent() throws Exception {
+        // Given
+        Mockito.when(service.findTopTenHighestEarningEmployees()).thenReturn(new ArrayList<>());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/topTenHighestEarningEmployeeNames"))
+                .andExpect(MockMvcResultMatchers.status().isNoContent())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).findTopTenHighestEarningEmployees();
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
     void getTopTenHighestEarningEmployeeNames_whenData_returnsEmployeeList() {
