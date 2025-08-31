@@ -144,7 +144,19 @@ class EmployeeControllerTest {
         Mockito.verifyNoMoreInteractions(service);
     }
     @Test
-    void getEmployeesByNameSearch_whenConnectRefused_returnsStatusServerError() {}
+    void getEmployeesByNameSearch_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+        // Given
+        var searchInput = new SearchInput("bob");
+        Mockito.when(service.search(searchInput)).thenThrow(new DownstreamUnavailableException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+
+        // Then
+        Mockito.verify(service).search(searchInput);
+        Mockito.verifyNoMoreInteractions(service);
+    }
     @Test
     void getEmployeesByNameSearch_whenSearchStringEmpty_returnsStatusBadRequest() {}
 
