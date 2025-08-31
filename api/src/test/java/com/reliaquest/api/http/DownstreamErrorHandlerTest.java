@@ -3,30 +3,47 @@ package com.reliaquest.api.http;
 import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
-import java.time.Duration;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.client.MockClientHttpResponse;
 
+import java.net.URI;
+import java.time.Duration;
+import java.util.UUID;
+
 class DownstreamErrorHandlerTest {
     private final DownstreamErrorHandler downstreamErrorHandler = new DownstreamErrorHandler();
 
     @Test
-    void hasError_returnsFalse_for2xxAnd204() throws Exception {
+    void hasError_returnsFalse_for2xx() throws Exception {
         // Given
         var responseOk = new MockClientHttpResponse(new byte[0], HttpStatus.OK);
-        var responseNoContent = new MockClientHttpResponse(new byte[0], HttpStatus.NO_CONTENT);
 
         // When
         boolean resultOk = downstreamErrorHandler.hasError(responseOk);
-        boolean resultNoContent = downstreamErrorHandler.hasError(responseNoContent);
 
         // Then
         Assertions.assertFalse(resultOk);
-        Assertions.assertFalse(resultNoContent);
+
+        responseOk.close();
     }
+
+    @Test
+    void hasError_returnsFalse_for204() throws Exception {
+        // Given
+        var responseNoContent = new MockClientHttpResponse(new byte[0], HttpStatus.NO_CONTENT);
+
+        // When
+        boolean resultNoContent = downstreamErrorHandler.hasError(responseNoContent);
+
+        // Then
+        Assertions.assertFalse(resultNoContent);
+
+        responseNoContent.close();
+    }
+
 
     @Test
     void handleError_404_throwsNotFound() {
