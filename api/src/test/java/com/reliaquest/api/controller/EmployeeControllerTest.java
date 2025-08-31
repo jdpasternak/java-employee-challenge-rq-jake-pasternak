@@ -87,7 +87,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getEmployeesByNameSearch_whenNoEmployeesExist_returnsStatusNoContent() throws Exception {
+    void getEmployeesByNameSearch_whenNoMatchingNameExists_returnsStatusNoContent() throws Exception {
         // Given
         var searchInput = new SearchInput("bob");
         Mockito.when(service.search(searchInput)).thenReturn(new ArrayList<>());
