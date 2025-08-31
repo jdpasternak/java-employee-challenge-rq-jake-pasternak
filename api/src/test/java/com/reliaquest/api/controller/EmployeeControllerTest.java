@@ -176,6 +176,18 @@ class EmployeeControllerTest {
 
     @Test
     void getEmployeeById() {
+    void getEmployeeById_whenNoEmployeeMatches_returnsStatusNotFound() throws Exception {
+    }
+    @Test
+    void getEmployeeById_whenEmployeeMatches_returnsEmployee() throws Exception {
+    }
+
+    @Test
+    void getEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() {
+    }
+
+    @Test
+    void getEmployeeById_whenBadUuid_returnsStatusBadRequest() {
     }
 
     @Test
