@@ -477,7 +477,20 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void deleteEmployeeById_whenNoEmployeeWithIdExists_returnStatusNotFound() throws Exception {}
+    void deleteEmployeeById_whenNoEmployeeWithIdExists_returnStatusNotFound() throws Exception {
+        // Given
+        var id = UUID.randomUUID();
+        Mockito.when(service.deleteEmployeeById(id)).thenThrow(new EmployeeNotFoundException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).deleteEmployeeById(id);
+        Mockito.verifyNoMoreInteractions(service);
+    }
     @Test
     void deleteEmployeeById_whenEmployeeWithIdExists_returnsEmployeeName() throws Exception {}
     @Test
