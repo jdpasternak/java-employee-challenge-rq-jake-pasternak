@@ -4,10 +4,10 @@ import java.time.Duration;
 import lombok.Getter;
 import lombok.Setter;
 
+@Getter
+@Setter
 public class DownstreamUnavailableException extends RuntimeException {
 
-    @Getter
-    @Setter
     private Duration retryAfter;
 
     public DownstreamUnavailableException() {
