@@ -16,7 +16,7 @@ public class EmployeeControllerAdvice {
     protected ResponseEntity<?> handleException(Throwable ex) {
         log.error("Error handling web request.", ex);
         // TODO create response model
-        return ResponseEntity.internalServerError().body(Response.error(ex.getMessage()));
+        return ResponseEntity.internalServerError().build();
     }
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<?> handleConstraintViolationException(Throwable ex) {
