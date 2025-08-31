@@ -48,12 +48,15 @@ class DownstreamErrorHandlerTest {
     @Test
     void handleError_404_throwsNotFound() {
         // Given
+        var id = UUID.randomUUID().toString();
         var resp = new MockClientHttpResponse(new byte[0], HttpStatus.NOT_FOUND);
 
         // When
         var exception = Assertions.assertThrows(EmployeeNotFoundException.class, () -> downstreamErrorHandler.handleError(URI.create("/api/v1/employee/%s".formatted(id)), null, resp));
 
         // Then
+        Assertions.assertEquals(exception.getId(), id);
+        resp.close();
     }
 
     @Test
