@@ -736,7 +736,7 @@ class EmployeeServiceTest {
         void deleteEmployeeById_whenClientReturnsFalse_throwsEmployeeNotFoundException() {
             // Given
             var uuid = UUID.randomUUID();
-            var id = UUID.randomUUID().toString();
+            var id = uuid.toString();
             Mockito.when(client.getById(uuid)).thenReturn(new Employee(uuid, "X", 100, 20, "T", "e@c"));
             Mockito.when(client.deleteByName("X")).thenReturn(false);
 
