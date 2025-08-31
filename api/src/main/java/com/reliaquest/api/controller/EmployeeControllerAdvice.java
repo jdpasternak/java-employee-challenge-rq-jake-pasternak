@@ -20,6 +20,6 @@ public class EmployeeControllerAdvice {
     @ExceptionHandler(ConstraintViolationException.class)
     protected ResponseEntity<?> handleConstraintViolationException(Throwable ex) {
         log.error("ConstraintViolationException!", ex);
-        return ResponseEntity.badRequest().body(Response.error(ex.getMessage()));
+        return ResponseEntity.badRequest().build();
     }
 }
