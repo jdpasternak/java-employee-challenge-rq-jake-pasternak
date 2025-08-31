@@ -492,9 +492,46 @@ class EmployeeControllerTest {
         Mockito.verifyNoMoreInteractions(service);
     }
     @Test
-    void deleteEmployeeById_whenEmployeeWithIdExists_returnsEmployeeName() throws Exception {}
+    void deleteEmployeeById_whenEmployeeWithIdExists_returnsEmployeeName() throws Exception {
+        // Given
+        var id = UUID.randomUUID();
+        Mockito.when(service.deleteEmployeeById(id)).thenReturn("N");
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().string("N"));
+
+        // Then
+        Mockito.verify(service).deleteEmployeeById(id);
+        Mockito.verifyNoMoreInteractions(service);
+    }
     @Test
-    void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {}
+    void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+        // Given
+        var id = UUID.randomUUID();
+        Mockito.when(service.deleteEmployeeById(id)).thenThrow(new DownstreamUnavailableException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).deleteEmployeeById(id);
+        Mockito.verifyNoMoreInteractions(service);
+    }
     @Test
-    void deleteEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {}
+    void deleteEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {
+        // Given
+        var id = "notauuid";
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verifyNoInteractions(service);
+    }
 }
