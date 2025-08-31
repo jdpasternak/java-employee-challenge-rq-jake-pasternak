@@ -1,6 +1,7 @@
 package com.reliaquest.api.controller;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
+import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
@@ -176,7 +177,20 @@ class EmployeeControllerTest {
 
     @Test
     void getEmployeeById_whenNoEmployeeMatches_returnsStatusNotFound() throws Exception {
+        // Given
+        var id = UUID.randomUUID();
+        Mockito.when(service.findById(id)).thenThrow(new EmployeeNotFoundException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
+                .andExpect(MockMvcResultMatchers.status().isNotFound())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).findById(id);
+        Mockito.verifyNoMoreInteractions(service);
     }
+
     @Test
     void getEmployeeById_whenEmployeeMatches_returnsEmployee() throws Exception {
     }
