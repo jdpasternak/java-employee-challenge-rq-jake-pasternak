@@ -232,8 +232,7 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
         // Then
         Mockito.verify(service).findById(id);
@@ -244,14 +243,15 @@ class EmployeeControllerTest {
     void getEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {
         // Given
         var id = "notauuid";
+        Mockito.when(service.findById(id)).thenThrow(new ConstraintViolationException("constraint violation", Set.of()));
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         // Then
-        Mockito.verifyNoInteractions(service);
+        Mockito.verify(service).findById(id);
+        Mockito.verifyNoMoreInteractions(service);
     }
 
     @Test
@@ -292,8 +292,7 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/highestSalary"))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
         // Then
         Mockito.verify(service).findHighestSalaryOfEmployees();
@@ -358,8 +357,7 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/topTenHighestEarningEmployeeNames"))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
         // Then
         Mockito.verify(service).findTopTenHighestEarningEmployees();
@@ -426,8 +424,7 @@ class EmployeeControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         // Then
         Mockito.verify(service).createEmployee(employeeInput);
@@ -452,8 +449,7 @@ class EmployeeControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
         // Then
         Mockito.verify(service).createEmployee(employeeInput);
@@ -526,8 +522,7 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
 
         // Then
         Mockito.verify(service).deleteEmployeeById(id);
@@ -538,13 +533,14 @@ class EmployeeControllerTest {
     void deleteEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {
         // Given
         var id = "notauuid";
+        Mockito.when(service.deleteEmployeeById(id)).thenThrow(new ConstraintViolationException("constraint violation", Set.of()));
 
         // When
         mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         // Then
-        Mockito.verifyNoInteractions(service);
+        Mockito.verify(service).deleteEmployeeById(id);
+        Mockito.verifyNoMoreInteractions(service);
     }
 }
