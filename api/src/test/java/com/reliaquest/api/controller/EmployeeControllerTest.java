@@ -290,6 +290,13 @@ class EmployeeControllerTest {
 
     @Test
     void getTopTenHighestEarningEmployeeNames() {
+    void getTopTenHighestEarningEmployeeNames_whenNoData_returnsStatusNoContent() throws Exception {
+    }
+    @Test
+    void getTopTenHighestEarningEmployeeNames_whenData_returnsEmployeeList() {
+    }
+    @Test
+    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServerError() {
     }
 
     @Test
