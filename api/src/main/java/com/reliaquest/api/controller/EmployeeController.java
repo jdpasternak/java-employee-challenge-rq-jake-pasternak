@@ -4,11 +4,11 @@ import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
-import java.util.List;
-import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/employee")
@@ -42,7 +42,7 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<Employee> getEmployeeById(String id) {
-        return ResponseEntity.ok(employeeService.findById(UUID.fromString(id)));
+        return ResponseEntity.ok(employeeService.findById(id));
     }
 
     @Override
@@ -70,6 +70,6 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<String> deleteEmployeeById(String id) {
-        return ResponseEntity.ok(employeeService.deleteEmployeeById(UUID.fromString(id)));
+        return ResponseEntity.ok(employeeService.deleteEmployeeById(id));
     }
 }
