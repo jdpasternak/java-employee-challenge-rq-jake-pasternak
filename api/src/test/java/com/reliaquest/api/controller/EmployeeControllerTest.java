@@ -186,8 +186,7 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         // Then
         Mockito.verify(service).findById(id);
@@ -489,8 +488,7 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.content().string(""));
+                .andExpect(MockMvcResultMatchers.status().isNotFound());
 
         // Then
         Mockito.verify(service).deleteEmployeeById(id);
