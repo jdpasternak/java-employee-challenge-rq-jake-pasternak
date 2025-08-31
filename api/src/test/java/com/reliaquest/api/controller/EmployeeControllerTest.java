@@ -303,10 +303,59 @@ class EmployeeControllerTest {
         Mockito.verifyNoMoreInteractions(service);
     }
     @Test
-    void getTopTenHighestEarningEmployeeNames_whenData_returnsEmployeeList() {
+    void getTopTenHighestEarningEmployeeNames_whenData_returnsEmployeeList() throws Exception {
+        // Given
+        Mockito.when(service.findTopTenHighestEarningEmployees()).thenReturn(List.of(
+                "Name 1",
+                "Name 2",
+                "Name 3",
+                "Name 4",
+                "Name 5",
+                "Name 6",
+                "Name 7",
+                "Name 8",
+                "Name 9",
+                "Name 10"
+        ));
+
+        var expectedBody = """
+                [
+                    "Name 1",
+                    "Name 2",
+                    "Name 3",
+                    "Name 4",
+                    "Name 5",
+                    "Name 6",
+                    "Name 7",
+                    "Name 8",
+                    "Name 9",
+                    "Name 10"
+                ]
+                """;
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/topTenHighestEarningEmployeeNames"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.content().json(expectedBody));
+
+        // Then
+        Mockito.verify(service).findTopTenHighestEarningEmployees();
+        Mockito.verifyNoMoreInteractions(service);
     }
     @Test
-    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServerError() {
+    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+        // Given
+        Mockito.when(service.findTopTenHighestEarningEmployees()).thenThrow(new DownstreamUnavailableException());
+
+        // When
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/topTenHighestEarningEmployeeNames"))
+                .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+                .andExpect(MockMvcResultMatchers.content().string(""));
+
+        // Then
+        Mockito.verify(service).findTopTenHighestEarningEmployees();
+        Mockito.verifyNoMoreInteractions(service);
     }
 
     @Test
