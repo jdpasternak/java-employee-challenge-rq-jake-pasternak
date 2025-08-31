@@ -240,7 +240,7 @@ class EmployeeServiceTest {
         @Test
         void search_whenCaseIgnoreCase_returnsMatches() throws DownstreamUnavailableException {
             // Given
-            List<Employee> result = new ArrayList<>();
+            List<Employee> result;
             List<Employee> expected = List.of(testEmployees.get(3), testEmployees.get(12));
             SearchInput searchInput = new SearchInput("Rand");
             Mockito.when(client.getAll()).thenReturn(expected);
