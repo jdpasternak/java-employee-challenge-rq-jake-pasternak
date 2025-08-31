@@ -11,6 +11,7 @@ public class RestClientConfig {
     @Bean
     RestTemplate employeeRestTemplate(RestTemplateBuilder builder) {
         return builder.rootUri("http://localhost:8112/api/v1")
+                .additionalInterceptors(new CorrelationInterceptor())
                 .errorHandler(new DownstreamErrorHandler())
                 .build();
     }
