@@ -181,7 +181,7 @@ class EmployeeControllerTest {
     @Test
     void getEmployeeById_whenNoEmployeeMatches_returnsStatusNotFound() throws Exception {
         // Given
-        var id = UUID.randomUUID();
+        var id = UUID.randomUUID().toString();
         Mockito.when(service.findById(id)).thenThrow(new EmployeeNotFoundException());
 
         // When
@@ -199,6 +199,9 @@ class EmployeeControllerTest {
         // Given
         var id = UUID.randomUUID();
         Mockito.when(service.findById(id)).thenReturn(new Employee(id, "N", 1, 20, "T", "e@c"));
+        var uuid = UUID.randomUUID();
+        var id = uuid.toString();
+        Mockito.when(service.findById(id)).thenReturn(new Employee(uuid, "N", 1, 20, "T", "e@c"));
         var expectedBody =
                 """
                 {
@@ -226,7 +229,7 @@ class EmployeeControllerTest {
     @Test
     void getEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
         // Given
-        var id = UUID.randomUUID();
+        var id = UUID.randomUUID().toString();
         Mockito.when(service.findById(id)).thenThrow(new DownstreamUnavailableException());
 
         // When
@@ -488,7 +491,7 @@ class EmployeeControllerTest {
     @Test
     void deleteEmployeeById_whenNoEmployeeWithIdExists_returnStatusNotFound() throws Exception {
         // Given
-        var id = UUID.randomUUID();
+        var id = UUID.randomUUID().toString();
         Mockito.when(service.deleteEmployeeById(id)).thenThrow(new EmployeeNotFoundException());
 
         // When
@@ -504,7 +507,7 @@ class EmployeeControllerTest {
     @Test
     void deleteEmployeeById_whenEmployeeWithIdExists_returnsEmployeeName() throws Exception {
         // Given
-        var id = UUID.randomUUID();
+        var id = UUID.randomUUID().toString();
         Mockito.when(service.deleteEmployeeById(id)).thenReturn("N");
 
         // When
@@ -520,7 +523,7 @@ class EmployeeControllerTest {
     @Test
     void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
         // Given
-        var id = UUID.randomUUID();
+        var id = UUID.randomUUID().toString();
         Mockito.when(service.deleteEmployeeById(id)).thenThrow(new DownstreamUnavailableException());
 
         // When
