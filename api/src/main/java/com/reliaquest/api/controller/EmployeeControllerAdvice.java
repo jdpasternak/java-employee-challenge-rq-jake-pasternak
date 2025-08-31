@@ -1,6 +1,7 @@
 package com.reliaquest.api.controller;
 
 import com.reliaquest.api.exception.EmployeeNotFoundException;
+import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +19,7 @@ public class EmployeeControllerAdvice {
         return ResponseEntity.internalServerError().build();
     }
 
-    @ExceptionHandler({ConstraintViolationException.class, IllegalArgumentException.class})
+    @ExceptionHandler({ConstraintViolationException.class, IllegalArgumentException.class, EmployeeWithNameAlreadyExistsException.class})
     protected ResponseEntity<?> handleInvalidInputExceptions(Throwable ex) {
         log.error("Bad Request!", ex);
         return ResponseEntity.badRequest().build();
