@@ -66,7 +66,7 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<Employee> createEmployee(CreateEmployeeInput employeeInput) {
-        return null;
+        return ResponseEntity.ok(employeeService.createEmployee(employeeInput));
     }
 
     @Override
