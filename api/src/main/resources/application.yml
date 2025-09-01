@@ -1,2 +1,24 @@
-spring.application.name: employee-api
+spring:
+  application:
+    name: employee-api
+  cache:
+    type: caffeine
 server.port: 8111
+
+app:
+  api:
+    base-path: /api/v1
+  downstream:
+    employee:
+      base-url: "http://localhost:8112/api/v1"
+      timeout:
+        connect: 1s
+        read: 3s
+  cache:
+    employees:
+      ttl: 30s
+      max-size: 1
+
+logging:
+  level:
+    com.reliaquest.api: INFO
