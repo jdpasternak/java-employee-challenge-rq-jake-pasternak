@@ -118,6 +118,7 @@ public class EmployeeControllerAdvice {
                 .addKeyValue("http.status", HttpStatus.METHOD_NOT_ALLOWED.value())
                 .log("no_resource_found");
         exception.getBody().setProperty("correlation_id", MDC.get("correlation_id"));
+        exception.getBody().setStatus(HttpStatus.METHOD_NOT_ALLOWED);
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(exception.getBody());
     }
 
