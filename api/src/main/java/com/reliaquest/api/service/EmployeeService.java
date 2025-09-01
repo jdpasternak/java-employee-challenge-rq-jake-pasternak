@@ -9,46 +9,52 @@ import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
+
+import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import java.util.OptionalInt;
 import java.util.UUID;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
 
 @Service
 @Validated
+@RequiredArgsConstructor
 public class EmployeeService {
 
     private final EmployeeClient client;
+    private final EmployeeReadService readService;
 
-    public EmployeeService(EmployeeClient client) {
-        this.client = client;
-    }
-
+    @Cacheable(cacheNames = "employees:all", key = "'ALL'")
     public List<Employee> findAll() {
-        return client.getAll();
+        return readService.findAll();
     }
 
     public List<Employee> search(@Valid SearchInput searchInput) {
-        List<Employee> employees = client.getAll();
-        String normalizedSearchString = searchInput.getSearchString().toLowerCase(Locale.ROOT);
-        return employees.stream()
-                .filter(employee -> employee.getName().toLowerCase(Locale.ROOT).contains(normalizedSearchString))
+        String normalizedSearchString = Normalizer.normalize(searchInput.getSearchString(), Normalizer.Form.NFKD).toLowerCase(Locale.ROOT);
+        return readService.findAll().stream()
+                .filter(employee -> Normalizer
+                        .normalize(employee.getName(), Normalizer.Form.NFKD)
+                        .toLowerCase(Locale.ROOT)
+                        .contains(normalizedSearchString))
                 .toList();
     }
 
     public Employee findById(@NotNull @org.hibernate.validator.constraints.UUID String id) {
-        return client.getById(UUID.fromString(id));
+        return readService.findAll().stream().filter(e -> e.getId().equals(UUID.fromString(id))).findFirst().orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
     public OptionalInt findHighestSalaryOfEmployees() {
-        List<Employee> employees = client.getAll();
+        List<Employee> employees = readService.findAll();
         return employees.stream().mapToInt(Employee::getSalary).max();
     }
 
     public List<String> findTopTenHighestEarningEmployees() {
-        List<Employee> employees = client.getAll();
+        List<Employee> employees = readService.findAll();
         return employees.stream()
                 .sorted(EmployeeComparators.BY_SALARY_DESC_NAME_ASC_ID_ASC)
                 .limit(10)
@@ -56,20 +62,23 @@ public class EmployeeService {
                 .toList();
     }
 
+    @CacheEvict(cacheNames = "employees:all", key = "'ALL'")
     public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) {
         String employeeName = employeeInput.name();
-        List<Employee> employees = client.getAll();
+        String employeeNameNormalized = employeeName.toLowerCase(Locale.ROOT);
+        List<Employee> employees = readService.findAll();
         if (employees.stream()
                 .map(Employee::getName)
                 .map(name -> name.toLowerCase(Locale.ROOT))
-                .anyMatch(employeeName.toLowerCase(Locale.ROOT)::equals)) {
+                .anyMatch(employeeNameNormalized::equals)) {
             throw new EmployeeWithNameAlreadyExistsException(employeeName);
         }
         return client.create(employeeInput);
     }
 
+    @CacheEvict(cacheNames = "employees:all", key = "'ALL'")
     public String deleteEmployeeById(@NotNull @org.hibernate.validator.constraints.UUID String id) throws EmployeeNotFoundException {
-        Employee employeeFound = client.getById(UUID.fromString(id));
+        var employeeFound = readService.findAll().stream().filter(e -> e.getId().equals(UUID.fromString(id))).findFirst().orElseThrow(() -> new EmployeeNotFoundException(id));
         String name = employeeFound.getName();
         boolean deleted = client.deleteByName(name);
         if (!deleted) {
