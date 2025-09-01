@@ -21,9 +21,10 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 
 @RestClientTest(EmployeeClient.class)
-@Import({RestClientConfig.class,
-        DownstreamErrorHandler.class,
-        CorrelationInterceptor.class,
+@Import({
+    RestClientConfig.class,
+    DownstreamErrorHandler.class,
+    CorrelationInterceptor.class,
 })
 class CorrelationInterceptorTest {
 
