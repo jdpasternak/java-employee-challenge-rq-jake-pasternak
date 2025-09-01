@@ -1,8 +1,12 @@
 package com.reliaquest.api.http;
 
+import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
+
 import com.reliaquest.api.config.PropsConfig;
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +19,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
-
-import java.util.UUID;
-
-import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
-import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
 
 @RestClientTest(EmployeeClient.class)
 @Import({RestClientConfig.class, DownstreamErrorHandler.class, CorrelationInterceptor.class, PropsConfig.class})

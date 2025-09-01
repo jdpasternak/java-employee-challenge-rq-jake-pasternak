@@ -3,15 +3,14 @@ package com.reliaquest.api.http;
 import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
+import java.net.URI;
+import java.time.Duration;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.mock.http.client.MockClientHttpResponse;
-
-import java.net.URI;
-import java.time.Duration;
-import java.util.UUID;
 
 class DownstreamErrorHandlerTest {
     private final DownstreamErrorHandler downstreamErrorHandler = new DownstreamErrorHandler();
@@ -44,7 +43,6 @@ class DownstreamErrorHandlerTest {
         responseNoContent.close();
     }
 
-
     @Test
     void handleError_404_throwsNotFound() {
         // Given
@@ -52,7 +50,9 @@ class DownstreamErrorHandlerTest {
         var resp = new MockClientHttpResponse(new byte[0], HttpStatus.NOT_FOUND);
 
         // When
-        var exception = Assertions.assertThrows(EmployeeNotFoundException.class, () -> downstreamErrorHandler.handleError(URI.create("/api/v1/employee/%s".formatted(id)), null, resp));
+        var exception = Assertions.assertThrows(
+                EmployeeNotFoundException.class,
+                () -> downstreamErrorHandler.handleError(URI.create("/api/v1/employee/%s".formatted(id)), null, resp));
 
         // Then
         Assertions.assertEquals(exception.getId(), id);
@@ -67,7 +67,8 @@ class DownstreamErrorHandlerTest {
 
         // When
         var ex = Assertions.assertThrows(
-                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
+                DownstreamUnavailableException.class,
+                () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         // Then
         Assertions.assertEquals(Duration.ofSeconds(2), ex.getRetryAfter());
@@ -83,7 +84,8 @@ class DownstreamErrorHandlerTest {
 
         // When
         var ex = Assertions.assertThrows(
-                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
+                DownstreamUnavailableException.class,
+                () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         // Then
         Assertions.assertNull(ex.getRetryAfter());
@@ -98,7 +100,8 @@ class DownstreamErrorHandlerTest {
 
         // When
         Assertions.assertThrows(
-                DownstreamUnavailableException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
+                DownstreamUnavailableException.class,
+                () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         // Then
 
@@ -113,7 +116,8 @@ class DownstreamErrorHandlerTest {
         // When
 
         // Then
-        Assertions.assertThrows(BadGatewayException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
+        Assertions.assertThrows(
+                BadGatewayException.class, () -> downstreamErrorHandler.handleError(URI.create(""), null, response));
 
         response.close();
     }

@@ -1,11 +1,18 @@
 package com.reliaquest.api.controller;
 
+import static com.reliaquest.api.http.ErrorCode.*;
+import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.PropertyKeys.*;
+
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
 import com.reliaquest.api.http.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
+import java.net.URI;
+import java.util.Comparator;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
@@ -14,14 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
-
-import java.net.URI;
-import java.util.Comparator;
-import java.util.Map;
-
-import static com.reliaquest.api.http.ErrorCode.*;
-import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
-import static com.reliaquest.api.log.LogConstants.PropertyKeys.*;
 
 @Slf4j
 @ControllerAdvice
@@ -33,7 +32,8 @@ public class EmployeeControllerAdvice {
                 .addKeyValue(HTTP_METHOD, request.getMethod())
                 .addKeyValue(HTTP_PATH, request.getRequestURI())
                 .addKeyValue(HTTP_STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .addKeyValue("error.code", SERVER_ERROR).log("server_error", exception);
+                .addKeyValue("error.code", SERVER_ERROR)
+                .log("server_error", exception);
 
         var problemDetail = base(HttpStatus.INTERNAL_SERVER_ERROR, request, "Server Error", SERVER_ERROR);
         problemDetail.setDetail("Server error.");
@@ -42,11 +42,14 @@ public class EmployeeControllerAdvice {
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
-    protected ResponseEntity<?> handleConstraintViolationException(ConstraintViolationException exception, HttpServletRequest request) {
-        var errors = exception.getConstraintViolations().stream().map(violation -> Map.of(
-                "field", leafName(violation.getPropertyPath().toString()),
-                "message", violation.getMessage()
-        )).sorted(Comparator.comparing(map -> map.get("field"))).toList();
+    protected ResponseEntity<?> handleConstraintViolationException(
+            ConstraintViolationException exception, HttpServletRequest request) {
+        var errors = exception.getConstraintViolations().stream()
+                .map(violation -> Map.of(
+                        "field", leafName(violation.getPropertyPath().toString()),
+                        "message", violation.getMessage()))
+                .sorted(Comparator.comparing(map -> map.get("field")))
+                .toList();
 
         var problemDetail = base(HttpStatus.BAD_REQUEST, request, "Constraint Violation", VALIDATION_FAILED);
         problemDetail.setDetail("One or more constraints failed.");
@@ -58,7 +61,9 @@ public class EmployeeControllerAdvice {
                 .addKeyValue(HTTP_STATUS, HttpStatus.BAD_REQUEST.value())
                 .addKeyValue("error.code", VALIDATION_FAILED)
                 .addKeyValue("violations.count", errors.size())
-                .addKeyValue("violations.fields", errors.stream().map(m -> m.get("field")).toList())
+                .addKeyValue(
+                        "violations.fields",
+                        errors.stream().map(m -> m.get("field")).toList())
                 .log("validation_failed");
 
         return ResponseEntity.badRequest().body(problemDetail);
@@ -101,7 +106,8 @@ public class EmployeeControllerAdvice {
     }
 
     @ExceptionHandler(DownstreamUnavailableException.class)
-    protected ResponseEntity<?> handleDownstreamUnavailableException(DownstreamUnavailableException exception, HttpServletRequest request) {
+    protected ResponseEntity<?> handleDownstreamUnavailableException(
+            DownstreamUnavailableException exception, HttpServletRequest request) {
         var pd = base(HttpStatus.SERVICE_UNAVAILABLE, request, "Downstream Unavailable", DOWNSTREAM_UNAVAILABLE);
         pd.setDetail("The downstream server has responded with an error.");
 
@@ -116,7 +122,8 @@ public class EmployeeControllerAdvice {
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
-    protected ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException exception, HttpServletRequest request) {
+    protected ResponseEntity<?> handleNoResourceFoundException(
+            NoResourceFoundException exception, HttpServletRequest request) {
         log.atInfo()
                 .addKeyValue(HTTP_METHOD, request.getMethod())
                 .addKeyValue(HTTP_PATH, request.getRequestURI())

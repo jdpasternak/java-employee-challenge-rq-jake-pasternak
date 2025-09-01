@@ -242,7 +242,8 @@ class EmployeeControllerTest {
     void getEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {
         // Given
         var id = "notauuid";
-        Mockito.when(service.findById(id)).thenThrow(new ConstraintViolationException("constraint violation", Set.of()));
+        Mockito.when(service.findById(id))
+                .thenThrow(new ConstraintViolationException("constraint violation", Set.of()));
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
@@ -349,8 +350,9 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable()
-            throws Exception {
+    void
+            getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable()
+                    throws Exception {
         // Given
         Mockito.when(service.findTopTenHighestEarningEmployees()).thenThrow(new DownstreamUnavailableException());
 
@@ -512,7 +514,8 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable() throws Exception {
+    void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable()
+            throws Exception {
         // Given
         var id = UUID.randomUUID().toString();
         Mockito.when(service.deleteEmployeeById(id)).thenThrow(new DownstreamUnavailableException());
@@ -530,7 +533,8 @@ class EmployeeControllerTest {
     void deleteEmployeeById_whenBadUuid_returnsStatusBadRequest() throws Exception {
         // Given
         var id = "notauuid";
-        Mockito.when(service.deleteEmployeeById(id)).thenThrow(new ConstraintViolationException("constraint violation", Set.of()));
+        Mockito.when(service.deleteEmployeeById(id))
+                .thenThrow(new ConstraintViolationException("constraint violation", Set.of()));
 
         // When
         mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))

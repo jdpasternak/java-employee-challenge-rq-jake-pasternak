@@ -1,5 +1,8 @@
 package com.reliaquest.api.gateway;
 
+import static com.reliaquest.api.gateway.GatewayConstants.EMPLOYEE_ENDPOINT;
+import static com.reliaquest.api.gateway.GatewayConstants.NAME;
+
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.http.EmployeeMapper;
 import com.reliaquest.api.http.Envelope;
@@ -19,9 +22,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import static com.reliaquest.api.gateway.GatewayConstants.EMPLOYEE_ENDPOINT;
-import static com.reliaquest.api.gateway.GatewayConstants.NAME;
 
 @Component
 public class EmployeeClient implements IEmployeeClient {

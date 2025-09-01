@@ -13,14 +13,12 @@ import org.springframework.context.annotation.Configuration;
 @EnableConfigurationProperties(CacheProperties.class)
 public class CacheConfiguration {
 
-
     @Bean
     CacheManager cacheManager(CacheProperties cacheProperties) {
         var manager = new CaffeineCacheManager(CacheConstants.EMPLOYEES_ALL);
-        manager.setCaffeine(
-                Caffeine.newBuilder()
-                        .maximumSize(cacheProperties.getMaxSize())
-                        .expireAfterWrite(cacheProperties.getTtl()));
+        manager.setCaffeine(Caffeine.newBuilder()
+                .maximumSize(cacheProperties.getMaxSize())
+                .expireAfterWrite(cacheProperties.getTtl()));
         return manager;
     }
 }

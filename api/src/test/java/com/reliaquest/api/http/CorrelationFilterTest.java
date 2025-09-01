@@ -1,10 +1,14 @@
 package com.reliaquest.api.http;
 
+import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
+
 import com.reliaquest.api.controller.EmployeeController;
 import com.reliaquest.api.controller.EmployeeControllerAdvice;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.service.EmployeeService;
+import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,11 +20,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.List;
-import java.util.UUID;
-
-import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
 
 @ExtendWith(MockitoExtension.class)
 class CorrelationFilterTest {

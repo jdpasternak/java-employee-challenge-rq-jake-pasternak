@@ -3,6 +3,9 @@ package com.reliaquest.api.http;
 import com.reliaquest.api.exception.BadGatewayException;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
+import java.io.IOException;
+import java.net.URI;
+import java.time.Duration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
@@ -10,10 +13,6 @@ import org.springframework.http.HttpStatusCode;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.DefaultResponseErrorHandler;
-
-import java.io.IOException;
-import java.net.URI;
-import java.time.Duration;
 
 @Component
 public class DownstreamErrorHandler extends DefaultResponseErrorHandler {

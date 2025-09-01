@@ -8,6 +8,7 @@ import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.ConstraintViolationException;
+import java.util.*;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-import java.util.*;
-
 @ExtendWith(MockitoExtension.class)
 @MockitoSettings(strictness = Strictness.LENIENT)
 class EmployeeServiceTest {
@@ -30,6 +29,7 @@ class EmployeeServiceTest {
 
     @Mock
     EmployeeClient client;
+
     @Mock
     EmployeeReadService readService;
 
@@ -229,6 +229,7 @@ class EmployeeServiceTest {
     class SearchTests {
         @MockBean
         EmployeeClient client;
+
         @MockBean
         EmployeeReadService readService;
 
@@ -316,6 +317,7 @@ class EmployeeServiceTest {
     class FindByIdTests {
         @MockBean
         EmployeeClient client;
+
         @MockBean
         EmployeeReadService readService;
 
@@ -584,6 +586,7 @@ class EmployeeServiceTest {
     class CreateEmployeeTests {
         @MockBean
         EmployeeClient client;
+
         @MockBean
         EmployeeReadService readService;
 
@@ -712,6 +715,7 @@ class EmployeeServiceTest {
     class DeleteEmployeeTests {
         @MockBean
         EmployeeClient client;
+
         @MockBean
         EmployeeReadService readService;
 

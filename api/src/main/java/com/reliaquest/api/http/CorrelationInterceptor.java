@@ -1,5 +1,9 @@
 package com.reliaquest.api.http;
 
+import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.PropertyKeys.DURATION_MS;
+
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -9,10 +13,6 @@ import org.springframework.http.client.ClientHttpRequestExecution;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
-
-import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
-import static com.reliaquest.api.log.LogConstants.PropertyKeys.DURATION_MS;
-import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
 
 @Slf4j
 @Component

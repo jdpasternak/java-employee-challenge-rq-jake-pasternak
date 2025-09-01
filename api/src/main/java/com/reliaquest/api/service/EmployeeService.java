@@ -1,5 +1,7 @@
 package com.reliaquest.api.service;
 
+import static com.reliaquest.api.cache.CacheConstants.EMPLOYEES_ALL;
+
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
 import com.reliaquest.api.gateway.EmployeeClient;
@@ -9,19 +11,16 @@ import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.stereotype.Service;
-import org.springframework.validation.annotation.Validated;
-
 import java.text.Normalizer;
 import java.util.List;
 import java.util.Locale;
 import java.util.OptionalInt;
 import java.util.UUID;
-
-import static com.reliaquest.api.cache.CacheConstants.EMPLOYEES_ALL;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 @Service
 @Validated
@@ -37,17 +36,20 @@ public class EmployeeService {
     }
 
     public List<Employee> search(@Valid SearchInput searchInput) {
-        String normalizedSearchString = Normalizer.normalize(searchInput.getSearchString(), Normalizer.Form.NFKD).toLowerCase(Locale.ROOT);
+        String normalizedSearchString = Normalizer.normalize(searchInput.getSearchString(), Normalizer.Form.NFKD)
+                .toLowerCase(Locale.ROOT);
         return readService.findAll().stream()
-                .filter(employee -> Normalizer
-                        .normalize(employee.getName(), Normalizer.Form.NFKD)
+                .filter(employee -> Normalizer.normalize(employee.getName(), Normalizer.Form.NFKD)
                         .toLowerCase(Locale.ROOT)
                         .contains(normalizedSearchString))
                 .toList();
     }
 
     public Employee findById(@NotNull @org.hibernate.validator.constraints.UUID String id) {
-        return readService.findAll().stream().filter(e -> e.getId().equals(UUID.fromString(id))).findFirst().orElseThrow(() -> new EmployeeNotFoundException(id));
+        return readService.findAll().stream()
+                .filter(e -> e.getId().equals(UUID.fromString(id)))
+                .findFirst()
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
     }
 
     public OptionalInt findHighestSalaryOfEmployees() {
@@ -79,8 +81,12 @@ public class EmployeeService {
     }
 
     @CacheEvict(cacheNames = EMPLOYEES_ALL, allEntries = true)
-    public String deleteEmployeeById(@NotNull @org.hibernate.validator.constraints.UUID String id) throws EmployeeNotFoundException {
-        var employeeFound = readService.findAll().stream().filter(e -> e.getId().equals(UUID.fromString(id))).findFirst().orElseThrow(() -> new EmployeeNotFoundException(id));
+    public String deleteEmployeeById(@NotNull @org.hibernate.validator.constraints.UUID String id)
+            throws EmployeeNotFoundException {
+        var employeeFound = readService.findAll().stream()
+                .filter(e -> e.getId().equals(UUID.fromString(id)))
+                .findFirst()
+                .orElseThrow(() -> new EmployeeNotFoundException(id));
         String name = employeeFound.getName();
         boolean deleted = client.deleteByName(name);
         if (!deleted) {

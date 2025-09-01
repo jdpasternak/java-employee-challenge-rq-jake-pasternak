@@ -1,14 +1,13 @@
 package com.reliaquest.api.service;
 
+import static com.reliaquest.api.cache.CacheConstants.EMPLOYEES_ALL;
+
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.Employee;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-
-import static com.reliaquest.api.cache.CacheConstants.EMPLOYEES_ALL;
 
 @Component
 @RequiredArgsConstructor

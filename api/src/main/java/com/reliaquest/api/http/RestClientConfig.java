@@ -7,17 +7,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.Duration;
-
 @Configuration
 @EnableConfigurationProperties(EmployeeApiProperties.class)
 public class RestClientConfig {
 
     @Bean
-    RestTemplate employeeRestTemplate(RestTemplateBuilder builder,
-                                      EmployeeApiProperties properties,
-                                      DownstreamErrorHandler downstreamErrorHandler,
-                                      CorrelationInterceptor correlationInterceptor) {
+    RestTemplate employeeRestTemplate(
+            RestTemplateBuilder builder,
+            EmployeeApiProperties properties,
+            DownstreamErrorHandler downstreamErrorHandler,
+            CorrelationInterceptor correlationInterceptor) {
         return builder.rootUri(properties.getBaseUrl())
                 .setConnectTimeout(properties.getTimeouts().getConnect())
                 .setReadTimeout(properties.getTimeouts().getRead())

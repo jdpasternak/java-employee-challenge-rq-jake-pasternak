@@ -2,10 +2,10 @@ package com.reliaquest.api.log;
 
 public final class LogConstants {
     private LogConstants() {}
-    
+
     public static final class MDCKeys {
         private MDCKeys() {}
-        
+
         public static final String CORRELATION_ID = "correlation_id";
     }
 

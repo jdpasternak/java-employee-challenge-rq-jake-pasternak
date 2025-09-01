@@ -1,22 +1,21 @@
 package com.reliaquest.api.http;
 
+import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.PropertyKeys.*;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
-import org.springframework.stereotype.Component;
-import org.springframework.web.filter.OncePerRequestFilter;
-
 import java.io.IOException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
-import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
-import static com.reliaquest.api.log.LogConstants.PropertyKeys.*;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.MDC;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 @Slf4j
 @Component
