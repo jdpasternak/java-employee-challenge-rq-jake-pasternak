@@ -731,12 +731,10 @@ class EmployeeServiceTest {
             Mockito.verifyNoInteractions(readService);
         }
 
-        @Disabled
         @Test
         void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
             // Given
             var id = "89eff840-bc7d-4a3e-b9c8-b46bbcc41043";
-            var uuid = UUID.fromString(id);
             Mockito.when(readService.findAll()).thenReturn(testEmployees);
 
             // When
