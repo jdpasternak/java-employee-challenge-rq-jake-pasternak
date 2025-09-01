@@ -6,7 +6,6 @@ import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.ConstraintViolationException;
 import java.util.*;
 import org.junit.jupiter.api.*;
@@ -239,7 +238,7 @@ class EmployeeServiceTest {
         @Test
         void search_whenBlank_throwsConstraintViolationException() {
             // Given
-            SearchInput searchInput = new SearchInput(" ");
+            var searchInput = " ";
 
             // When
 
@@ -254,7 +253,7 @@ class EmployeeServiceTest {
             // Given
             List<Employee> result;
             List<Employee> expected = List.of(testEmployees.get(3), testEmployees.get(12));
-            SearchInput searchInput = new SearchInput("Rand");
+            var searchInput = "Rand";
             Mockito.when(readService.findAll()).thenReturn(expected);
 
             // When
@@ -276,7 +275,7 @@ class EmployeeServiceTest {
         void search_whenNameHasDiacritics_returnsMatches() throws DownstreamUnavailableException {
             // Given
             List<Employee> expected = List.of(testEmployees.get(6));
-            SearchInput searchInput = new SearchInput("Gíno");
+            var searchInput = "Gíno";
 
             // When
             List<Employee> result = employeeService.search(searchInput);
@@ -296,7 +295,7 @@ class EmployeeServiceTest {
         void search_whenNoEmployeesExist_returnsEmptyList() throws DownstreamUnavailableException {
             // Given
             List<Employee> result;
-            SearchInput searchInput = new SearchInput("Gíno");
+            var searchInput = "Gíno";
             Mockito.when(readService.findAll()).thenReturn(new ArrayList<>());
 
             // When

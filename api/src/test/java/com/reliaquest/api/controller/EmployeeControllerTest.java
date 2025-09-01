@@ -5,7 +5,6 @@ import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
 import jakarta.validation.ConstraintViolationException;
 import java.util.*;
@@ -89,11 +88,11 @@ class EmployeeControllerTest {
     @Test
     void getEmployeesByNameSearch_whenNoMatchingNameExists_returnsStatusNoContent() throws Exception {
         // Given
-        var searchInput = new SearchInput("bob");
+        var searchInput = "bob";
         Mockito.when(service.search(searchInput)).thenReturn(new ArrayList<>());
 
         // When
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput)))
                 .andExpect(MockMvcResultMatchers.status().isNoContent())
                 .andExpect(MockMvcResultMatchers.content().string(""));
 
@@ -105,7 +104,7 @@ class EmployeeControllerTest {
     @Test
     void getEmployeesByNameSearch_whenMatchingNameExists_returnsEmployee() throws Exception {
         // Given
-        var searchInput = new SearchInput("bob");
+        var searchInput = "bob";
         UUID idB = UUID.randomUUID();
         UUID idJ = UUID.randomUUID();
         Mockito.when(service.search(searchInput))
@@ -136,7 +135,7 @@ class EmployeeControllerTest {
                         .formatted(idB, idJ);
 
         // When
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput)))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.content().json(expectedBody));
@@ -150,11 +149,11 @@ class EmployeeControllerTest {
     void getEmployeesByNameSearch_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable()
             throws Exception {
         // Given
-        var searchInput = new SearchInput("bob");
+        var searchInput = "bob";
         Mockito.when(service.search(searchInput)).thenThrow(new DownstreamUnavailableException());
 
         // When
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput)))
                 .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
@@ -165,12 +164,12 @@ class EmployeeControllerTest {
     @Test
     void getEmployeesByNameSearch_whenSearchStringEmpty_returnsStatusBadRequest() throws Exception {
         // Given
-        var searchInput = new SearchInput(" ");
+        var searchInput = " ";
         Mockito.when(service.search(searchInput))
                 .thenThrow(new ConstraintViolationException("invalid search string", Set.of()));
 
         // When
-        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput)))
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
 
         // Then

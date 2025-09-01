@@ -8,8 +8,8 @@ import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.helper.EmployeeComparators;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-import com.reliaquest.api.model.SearchInput;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.text.Normalizer;
 import java.util.List;
@@ -35,9 +35,9 @@ public class EmployeeService {
         return readService.findAll();
     }
 
-    public List<Employee> search(@Valid SearchInput searchInput) {
-        String normalizedSearchString = Normalizer.normalize(searchInput.getSearchString(), Normalizer.Form.NFKD)
-                .toLowerCase(Locale.ROOT);
+    public List<Employee> search(@NotBlank String searchInput) {
+        String normalizedSearchString =
+                Normalizer.normalize(searchInput, Normalizer.Form.NFKD).toLowerCase(Locale.ROOT);
         return readService.findAll().stream()
                 .filter(employee -> Normalizer.normalize(employee.getName(), Normalizer.Form.NFKD)
                         .toLowerCase(Locale.ROOT)
