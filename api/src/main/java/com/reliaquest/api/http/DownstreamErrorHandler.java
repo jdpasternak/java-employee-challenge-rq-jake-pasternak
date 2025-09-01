@@ -16,6 +16,11 @@ import java.time.Duration;
 
 public class DownstreamErrorHandler extends DefaultResponseErrorHandler {
     @Override
+    public void handleError(ClientHttpResponse response) throws IOException {
+        this.handleError(URI.create("about:blank"), null, response);
+    }
+
+    @Override
     public void handleError(URI url, HttpMethod method, ClientHttpResponse response) throws IOException {
         HttpStatusCode status = response.getStatusCode();
 
