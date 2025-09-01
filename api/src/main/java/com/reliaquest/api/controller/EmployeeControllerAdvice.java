@@ -3,6 +3,7 @@ package com.reliaquest.api.controller;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
 import com.reliaquest.api.exception.EmployeeNotFoundException;
 import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
+import com.reliaquest.api.http.ErrorCode;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,10 @@ import java.net.URI;
 import java.util.Comparator;
 import java.util.Map;
 
+import static com.reliaquest.api.http.ErrorCode.*;
+import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.PropertyKeys.*;
+
 @Slf4j
 @ControllerAdvice
 public class EmployeeControllerAdvice {
@@ -25,12 +30,12 @@ public class EmployeeControllerAdvice {
     @ExceptionHandler
     protected ResponseEntity<?> handleException(Throwable exception, HttpServletRequest request) {
         log.atError()
-                .addKeyValue("http.method", request.getMethod())
-                .addKeyValue("http.path", request.getRequestURI())
-                .addKeyValue("http.status", HttpStatus.INTERNAL_SERVER_ERROR.value())
-                .addKeyValue("error.code", "SERVER_ERROR").log("server_error", exception);
+                .addKeyValue(HTTP_METHOD, request.getMethod())
+                .addKeyValue(HTTP_PATH, request.getRequestURI())
+                .addKeyValue(HTTP_STATUS, HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .addKeyValue("error.code", SERVER_ERROR).log("server_error", exception);
 
-        var problemDetail = base(HttpStatus.INTERNAL_SERVER_ERROR, request, "Server Error", "SERVER_ERROR");
+        var problemDetail = base(HttpStatus.INTERNAL_SERVER_ERROR, request, "Server Error", SERVER_ERROR);
         problemDetail.setDetail("Server error.");
 
         return ResponseEntity.internalServerError().body(problemDetail);
@@ -43,15 +48,15 @@ public class EmployeeControllerAdvice {
                 "message", violation.getMessage()
         )).sorted(Comparator.comparing(map -> map.get("field"))).toList();
 
-        var problemDetail = base(HttpStatus.BAD_REQUEST, request, "Constraint Violation", "VALIDATION_FAILED");
+        var problemDetail = base(HttpStatus.BAD_REQUEST, request, "Constraint Violation", VALIDATION_FAILED);
         problemDetail.setDetail("One or more constraints failed.");
         problemDetail.setProperty("errors", errors);
 
         log.atInfo()
-                .addKeyValue("http.method", request.getMethod())
-                .addKeyValue("http.path", request.getRequestURI())
-                .addKeyValue("http.status", HttpStatus.BAD_REQUEST.value())
-                .addKeyValue("error.code", "VALIDATION_FAILED")
+                .addKeyValue(HTTP_METHOD, request.getMethod())
+                .addKeyValue(HTTP_PATH, request.getRequestURI())
+                .addKeyValue(HTTP_STATUS, HttpStatus.BAD_REQUEST.value())
+                .addKeyValue("error.code", VALIDATION_FAILED)
                 .addKeyValue("violations.count", errors.size())
                 .addKeyValue("violations.fields", errors.stream().map(m -> m.get("field")).toList())
                 .log("validation_failed");
@@ -63,14 +68,14 @@ public class EmployeeControllerAdvice {
     ResponseEntity<ProblemDetail> handleEmployeeNotFoundException(
             EmployeeNotFoundException ex, HttpServletRequest req) {
 
-        var pd = base(HttpStatus.NOT_FOUND, req, "Employee Not Found", "EMPLOYEE_NOT_FOUND");
+        var pd = base(HttpStatus.NOT_FOUND, req, "Employee Not Found", EMPLOYEE_NOT_FOUND);
         pd.setDetail("An employee with ID '%s' doesn't exists.".formatted(ex.getId()));
 
         log.atWarn()
-                .addKeyValue("http.method", req.getMethod())
-                .addKeyValue("http.path", req.getRequestURI())
-                .addKeyValue("http.status", HttpStatus.NOT_FOUND.value())
-                .addKeyValue("error.code", "EMPLOYEE_NOT_FOUND")
+                .addKeyValue(HTTP_METHOD, req.getMethod())
+                .addKeyValue(HTTP_PATH, req.getRequestURI())
+                .addKeyValue(HTTP_STATUS, HttpStatus.NOT_FOUND.value())
+                .addKeyValue("error.code", EMPLOYEE_NOT_FOUND)
                 .addKeyValue("id", ex.getId())
                 .log("not_found");
 
@@ -81,14 +86,14 @@ public class EmployeeControllerAdvice {
     ResponseEntity<ProblemDetail> handleEmployeeWithNameAlreadyExistsException(
             EmployeeWithNameAlreadyExistsException ex, HttpServletRequest req) {
 
-        var pd = base(HttpStatus.CONFLICT, req, "Conflict", "EMPLOYEE_NAME_EXISTS");
+        var pd = base(HttpStatus.CONFLICT, req, "Conflict", EMPLOYEE_NAME_CONFLICT);
         pd.setDetail("An employee named '%s' already exists.".formatted(ex.getName()));
 
         log.atWarn()
-                .addKeyValue("http.method", req.getMethod())
-                .addKeyValue("http.path", req.getRequestURI())
-                .addKeyValue("http.status", HttpStatus.CONFLICT.value())
-                .addKeyValue("error.code", "EMPLOYEE_NAME_EXISTS")
+                .addKeyValue(HTTP_METHOD, req.getMethod())
+                .addKeyValue(HTTP_PATH, req.getRequestURI())
+                .addKeyValue(HTTP_STATUS, HttpStatus.CONFLICT.value())
+                .addKeyValue("error.code", EMPLOYEE_NAME_CONFLICT)
                 .addKeyValue("name", ex.getName())
                 .log("conflict");
 
@@ -97,14 +102,14 @@ public class EmployeeControllerAdvice {
 
     @ExceptionHandler(DownstreamUnavailableException.class)
     protected ResponseEntity<?> handleDownstreamUnavailableException(DownstreamUnavailableException exception, HttpServletRequest request) {
-        var pd = base(HttpStatus.SERVICE_UNAVAILABLE, request, "Downstream Unavailable", "DOWNSTREAM_UNAVAILABLE");
+        var pd = base(HttpStatus.SERVICE_UNAVAILABLE, request, "Downstream Unavailable", DOWNSTREAM_UNAVAILABLE);
         pd.setDetail("The downstream server has responded with an error.");
 
         log.atWarn()
-                .addKeyValue("http.method", request.getMethod())
-                .addKeyValue("http.path", request.getRequestURI())
-                .addKeyValue("http.status", HttpStatus.CONFLICT.value())
-                .addKeyValue("error.code", "DOWNSTREAM_UNAVAILABLE")
+                .addKeyValue(HTTP_METHOD, request.getMethod())
+                .addKeyValue(HTTP_PATH, request.getRequestURI())
+                .addKeyValue(HTTP_STATUS, HttpStatus.CONFLICT.value())
+                .addKeyValue("error.code", DOWNSTREAM_UNAVAILABLE)
                 .log("downstream_unavailable");
 
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(pd);
@@ -113,21 +118,21 @@ public class EmployeeControllerAdvice {
     @ExceptionHandler(NoResourceFoundException.class)
     protected ResponseEntity<?> handleNoResourceFoundException(NoResourceFoundException exception, HttpServletRequest request) {
         log.atInfo()
-                .addKeyValue("http.method", request.getMethod())
-                .addKeyValue("http.path", request.getRequestURI())
-                .addKeyValue("http.status", HttpStatus.METHOD_NOT_ALLOWED.value())
+                .addKeyValue(HTTP_METHOD, request.getMethod())
+                .addKeyValue(HTTP_PATH, request.getRequestURI())
+                .addKeyValue(HTTP_STATUS, HttpStatus.METHOD_NOT_ALLOWED.value())
                 .log("no_resource_found");
-        exception.getBody().setProperty("correlation_id", MDC.get("correlation_id"));
+        exception.getBody().setProperty(CORRELATION_ID, MDC.get(CORRELATION_ID));
         exception.getBody().setStatus(HttpStatus.METHOD_NOT_ALLOWED);
         return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(exception.getBody());
     }
 
-    private static ProblemDetail base(HttpStatus status, HttpServletRequest req, String title, String code) {
+    private static ProblemDetail base(HttpStatus status, HttpServletRequest req, String title, ErrorCode code) {
         var pd = ProblemDetail.forStatus(status);
         pd.setTitle(title);
         pd.setType(URI.create("about:blank"));
         pd.setInstance(URI.create(req.getRequestURI()));
-        pd.setProperty("correlation_id", MDC.get("correlation_id"));
+        pd.setProperty(CORRELATION_ID, MDC.get(CORRELATION_ID));
         pd.setProperty("error.code", code);
         return pd;
     }

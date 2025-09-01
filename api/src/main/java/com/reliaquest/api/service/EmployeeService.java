@@ -21,6 +21,8 @@ import java.util.Locale;
 import java.util.OptionalInt;
 import java.util.UUID;
 
+import static com.reliaquest.api.cache.CacheConstants.EMPLOYEES_ALL;
+
 @Service
 @Validated
 @RequiredArgsConstructor
@@ -29,7 +31,7 @@ public class EmployeeService {
     private final EmployeeClient client;
     private final EmployeeReadService readService;
 
-    @Cacheable(cacheNames = "employees:all", key = "'ALL'")
+    @Cacheable(cacheNames = EMPLOYEES_ALL)
     public List<Employee> findAll() {
         return readService.findAll();
     }
@@ -62,7 +64,7 @@ public class EmployeeService {
                 .toList();
     }
 
-    @CacheEvict(cacheNames = "employees:all", key = "'ALL'")
+    @CacheEvict(cacheNames = EMPLOYEES_ALL, allEntries = true)
     public Employee createEmployee(@Valid CreateEmployeeInput employeeInput) {
         String employeeName = employeeInput.name();
         String employeeNameNormalized = employeeName.toLowerCase(Locale.ROOT);
@@ -76,7 +78,7 @@ public class EmployeeService {
         return client.create(employeeInput);
     }
 
-    @CacheEvict(cacheNames = "employees:all", key = "'ALL'")
+    @CacheEvict(cacheNames = EMPLOYEES_ALL, allEntries = true)
     public String deleteEmployeeById(@NotNull @org.hibernate.validator.constraints.UUID String id) throws EmployeeNotFoundException {
         var employeeFound = readService.findAll().stream().filter(e -> e.getId().equals(UUID.fromString(id))).findFirst().orElseThrow(() -> new EmployeeNotFoundException(id));
         String name = employeeFound.getName();

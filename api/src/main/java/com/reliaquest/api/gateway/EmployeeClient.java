@@ -20,6 +20,9 @@ import org.springframework.web.client.ResourceAccessException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
+import static com.reliaquest.api.gateway.GatewayConstants.EMPLOYEE_ENDPOINT;
+import static com.reliaquest.api.gateway.GatewayConstants.NAME;
+
 @Component
 public class EmployeeClient implements IEmployeeClient {
 
@@ -32,7 +35,7 @@ public class EmployeeClient implements IEmployeeClient {
     public List<Employee> getAll() {
         return ioSafe(() -> {
             var type = new ParameterizedTypeReference<Envelope<List<WireEmployee>>>() {};
-            var response = restTemplate.exchange("/employee", HttpMethod.GET, null, type);
+            var response = restTemplate.exchange(EMPLOYEE_ENDPOINT, HttpMethod.GET, null, type);
 
             var wire =
                     Optional.ofNullable(response.getBody()).map(Envelope::data).orElse(List.of());
@@ -44,7 +47,7 @@ public class EmployeeClient implements IEmployeeClient {
     public Employee getById(UUID id) {
         return ioSafe(() -> {
             var type = new ParameterizedTypeReference<Envelope<WireEmployee>>() {};
-            var response = restTemplate.exchange("/employee/%s".formatted(id), HttpMethod.GET, null, type);
+            var response = restTemplate.exchange("%s/%s".formatted(EMPLOYEE_ENDPOINT, id), HttpMethod.GET, null, type);
 
             var wire =
                     Optional.ofNullable(response.getBody()).map(Envelope::data).orElse(null);
@@ -58,7 +61,7 @@ public class EmployeeClient implements IEmployeeClient {
             var type = new ParameterizedTypeReference<Envelope<WireEmployee>>() {};
             var requestWire = EmployeeMapper.toWire(in);
             var entity = new HttpEntity<>(requestWire);
-            var response = restTemplate.exchange("/employee", HttpMethod.POST, entity, type);
+            var response = restTemplate.exchange(EMPLOYEE_ENDPOINT, HttpMethod.POST, entity, type);
 
             var responseWire =
                     Optional.ofNullable(response.getBody()).map(Envelope::data).orElse(null);
@@ -70,9 +73,9 @@ public class EmployeeClient implements IEmployeeClient {
     public boolean deleteByName(String name) {
         return ioSafe(() -> {
             var type = new ParameterizedTypeReference<Envelope<Boolean>>() {};
-            var body = Map.of("name", name);
+            var body = Map.of(NAME, name);
             var entity = new HttpEntity<>(body);
-            var response = restTemplate.exchange("/employee", HttpMethod.DELETE, entity, type);
+            var response = restTemplate.exchange(EMPLOYEE_ENDPOINT, HttpMethod.DELETE, entity, type);
 
             return Boolean.TRUE.equals(
                     Optional.ofNullable(response.getBody()).map(Envelope::data).orElse(null));

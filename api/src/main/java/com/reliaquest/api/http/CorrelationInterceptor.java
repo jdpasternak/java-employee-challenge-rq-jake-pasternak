@@ -10,16 +10,19 @@ import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.stereotype.Component;
 
+import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
+import static com.reliaquest.api.log.LogConstants.PropertyKeys.DURATION_MS;
+import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
+
 @Slf4j
 @Component
 public class CorrelationInterceptor implements ClientHttpRequestInterceptor {
-    private static final String HDR = "X-Correlation-Id";
 
     @Override
     public ClientHttpResponse intercept(HttpRequest request, byte[] body, ClientHttpRequestExecution execution)
             throws IOException {
-        String correlationId = MDC.get("correlation_id");
-        if (correlationId != null) request.getHeaders().set(HDR, correlationId);
+        String correlationId = MDC.get(CORRELATION_ID);
+        if (correlationId != null) request.getHeaders().set(X_CORRELATION_ID, correlationId);
         var t0 = System.nanoTime();
 
         var method = request.getMethod().name();
@@ -35,7 +38,7 @@ public class CorrelationInterceptor implements ClientHttpRequestInterceptor {
                 .addKeyValue("downstream.method", method)
                 .addKeyValue("downstream.path", path)
                 .addKeyValue("downstream.status", response.getStatusCode())
-                .addKeyValue("duration_ms", TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0))
+                .addKeyValue(DURATION_MS, TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - t0))
                 .log("downstream_request_completed");
 
         return response;
