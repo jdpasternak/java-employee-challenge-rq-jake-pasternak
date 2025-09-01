@@ -18,7 +18,6 @@ import java.util.OptionalInt;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 
@@ -30,7 +29,6 @@ public class EmployeeService {
     private final EmployeeClient client;
     private final EmployeeReadService readService;
 
-    @Cacheable(cacheNames = EMPLOYEES_ALL)
     public List<Employee> findAll() {
         return readService.findAll();
     }
