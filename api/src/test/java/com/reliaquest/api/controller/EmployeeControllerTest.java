@@ -73,13 +73,13 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getAllEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    void getAllEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable() throws Exception {
         // Given
         Mockito.when(service.findAll()).thenThrow(new DownstreamUnavailableException());
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee"))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
         Mockito.verify(service).findAll();
@@ -147,7 +147,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getEmployeesByNameSearch_whenServiceThrowsDownstreamUnavailableException_returnsServerError()
+    void getEmployeesByNameSearch_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable()
             throws Exception {
         // Given
         var searchInput = new SearchInput("bob");
@@ -155,7 +155,7 @@ class EmployeeControllerTest {
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/search/%s".formatted(searchInput.getSearchString())))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
         Mockito.verify(service).search(searchInput);
@@ -224,14 +224,14 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    void getEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable() throws Exception {
         // Given
         var id = UUID.randomUUID().toString();
         Mockito.when(service.findById(id)).thenThrow(new DownstreamUnavailableException());
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
         Mockito.verify(service).findById(id);
@@ -284,14 +284,14 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getHighestSalaryOfEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServerError()
+    void getHighestSalaryOfEmployees_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable()
             throws Exception {
         // Given
         Mockito.when(service.findHighestSalaryOfEmployees()).thenThrow(new DownstreamUnavailableException());
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/highestSalary"))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
         Mockito.verify(service).findHighestSalaryOfEmployees();
@@ -349,14 +349,14 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServerError()
+    void getTopTenHighestEarningEmployeeNames_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable()
             throws Exception {
         // Given
         Mockito.when(service.findTopTenHighestEarningEmployees()).thenThrow(new DownstreamUnavailableException());
 
         // When
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/employee/topTenHighestEarningEmployeeNames"))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
         Mockito.verify(service).findTopTenHighestEarningEmployees();
@@ -431,7 +431,7 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void createEmployee_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    void createEmployee_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable() throws Exception {
         // Given
         var employeeInput = new CreateEmployeeInput("N", 1, 20, "T");
         var body =
@@ -448,7 +448,7 @@ class EmployeeControllerTest {
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/employee")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
         Mockito.verify(service).createEmployee(employeeInput);
@@ -512,14 +512,14 @@ class EmployeeControllerTest {
     }
 
     @Test
-    void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServerError() throws Exception {
+    void deleteEmployeeById_whenServiceThrowsDownstreamUnavailableException_returnsServiceUnavailable() throws Exception {
         // Given
         var id = UUID.randomUUID().toString();
         Mockito.when(service.deleteEmployeeById(id)).thenThrow(new DownstreamUnavailableException());
 
         // When
         mvc.perform(MockMvcRequestBuilders.delete("/api/v1/employee/%s".formatted(id)))
-                .andExpect(MockMvcResultMatchers.status().isInternalServerError());
+                .andExpect(MockMvcResultMatchers.status().isServiceUnavailable());
 
         // Then
         Mockito.verify(service).deleteEmployeeById(id);
