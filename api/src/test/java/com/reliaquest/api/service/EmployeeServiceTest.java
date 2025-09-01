@@ -1,0 +1,792 @@
+package com.reliaquest.api.service;
+
+import com.reliaquest.api.exception.DownstreamUnavailableException;
+import com.reliaquest.api.exception.EmployeeNotFoundException;
+import com.reliaquest.api.exception.EmployeeWithNameAlreadyExistsException;
+import com.reliaquest.api.gateway.EmployeeClient;
+import com.reliaquest.api.model.CreateEmployeeInput;
+import com.reliaquest.api.model.Employee;
+import com.reliaquest.api.model.SearchInput;
+import jakarta.validation.ConstraintViolationException;
+import java.util.*;
+import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.junit.jupiter.MockitoSettings;
+import org.mockito.quality.Strictness;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+
+@ExtendWith(MockitoExtension.class)
+@MockitoSettings(strictness = Strictness.LENIENT)
+class EmployeeServiceTest {
+    EmployeeService employeeService;
+
+    @Mock
+    EmployeeClient client;
+
+    @Mock
+    EmployeeReadService readService;
+
+    List<Employee> testEmployees;
+
+    @BeforeEach
+    void setUp() {
+        employeeService = new EmployeeService(client, readService);
+        Employee nullSalaryEmployee = new Employee();
+        nullSalaryEmployee.setName("nullname");
+        nullSalaryEmployee.setAge(20);
+        nullSalaryEmployee.setTitle("nulltitle");
+        nullSalaryEmployee.setEmail("nullemail");
+        nullSalaryEmployee.setId(UUID.randomUUID());
+        Employee duplicateSalaryEmployee = new Employee(
+                UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41043"),
+                "Shardo Gibsona",
+                378048,
+                32,
+                "Legacy Accounting Executor",
+                "sup-ex@company.com");
+        Employee duplicate10thSalaryEmployee = new Employee(
+                UUID.fromString("1500c807-a43a-4d73-9862-a3c4b9331d78"),
+                "Andrio Schmidt PhD",
+                275740,
+                47,
+                "Consulting Facilition Manager",
+                "lotstrung@company.com");
+        testEmployees = List.of(
+                // 0 - sal_6(tie), sub_sal_3
+                new Employee(
+                        UUID.fromString("99eff840-bc7d-4a3e-b9c8-b46bbcc41042"),
+                        "Sharda Gibson",
+                        378048,
+                        31,
+                        "Legacy Accounting Executive",
+                        "sub-ex@company.com"),
+                // 1 - sal_10, sub_sal_5, Highest Salary of sublist(0,5) and overall.
+                new Employee(
+                        UUID.fromString("f5651c6b-e001-46ed-b455-6b4613825de3"),
+                        "Vena Dickens IV",
+                        490233,
+                        45,
+                        "Forward Healthcare Strategist",
+                        "blade_runnerz@company.com"),
+                // 2 - sal_9, sub_sal_4
+                new Employee(
+                        UUID.fromString("a552a9a2-44a6-4ff4-80ea-28747a70e661"),
+                        "Natalia Wyman",
+                        433856,
+                        56,
+                        "International Analyst",
+                        "cardguard@company.com"),
+                // 3 - sal_4, sub_sal_2
+                new Employee(
+                        UUID.fromString("824af032-38bc-444a-8baa-46e41e24ae4e"),
+                        "Randall Batz",
+                        367484,
+                        28,
+                        "IT Architect",
+                        "veribet@company.com"),
+                // 4 - sal_, sub_sal_1, Lowest Salary of sublist(0,5)
+                new Employee(
+                        UUID.fromString("84f48b4c-150a-47b3-bb73-8be88655eb45"),
+                        "Ms. Gladys Schaden",
+                        126899,
+                        65,
+                        "Accounting Assistant",
+                        "lotstring@company.com"),
+                // 5 - sal_1
+                new Employee(
+                        UUID.fromString("1500c807-a43a-4d73-9862-a3c4b9331d77"),
+                        "Andria Schmidt PhD",
+                        275740,
+                        46,
+                        "Consulting Facilitator",
+                        "lotstring@company.com"),
+                // 6 - sal_
+                new Employee(
+                        UUID.fromString("561d7025-4128-4009-8ec0-2d9fa6c2f429"),
+                        "Gino Hagenes",
+                        108360,
+                        42,
+                        "Mining Representative",
+                        "sub-ex@company.com"),
+                // 7 - sal_7
+                new Employee(
+                        UUID.fromString("f450a809-ac1c-46a9-9d97-552dc738fde4"),
+                        "Zandra Stiedemann",
+                        413932,
+                        17,
+                        "Future Healthcare Orchestrator",
+                        "cookley@company.com"),
+                // 8 - sal_5
+                new Employee(
+                        UUID.fromString("f243211a-748e-4e06-bd0e-a31a8fd5515e"),
+                        "Magaly Huels III",
+                        377301,
+                        51,
+                        "Mining Agent",
+                        "y-find@company.com"),
+                // 9 - sal_8
+                new Employee(
+                        UUID.fromString("639fd1cc-3fda-4035-893e-e41437ba50a0"),
+                        "Janiece Braun",
+                        423689,
+                        50,
+                        "Central Officer",
+                        "colonelkickass@company.com"),
+                // 10 - sal_2
+                new Employee(
+                        UUID.fromString("63d8895b-e5fb-4af4-9acf-c40f8b11fd21"),
+                        "Antoine Leannon",
+                        334095,
+                        25,
+                        "Senior Technology Designer",
+                        "bitchin_blair@company.com"),
+                // 11 - sal_3
+                new Employee(
+                        UUID.fromString("fc17c110-12ed-4a9f-849f-d24a84c0096f"),
+                        "Eboni Graham",
+                        345847,
+                        50,
+                        "Farming Facilitator",
+                        "prodder@company.com"),
+                // 12 - sal_
+                new Employee(
+                        UUID.fromString("824af032-38bc-1234-8baa-46e41e24ae4e"),
+                        "Brandy Marsh",
+                        367484,
+                        28,
+                        "IT Architect",
+                        "cremefraiche@company.com"),
+                // 13 - sal_null
+                nullSalaryEmployee,
+                // 14 sal_6(tie)
+                duplicateSalaryEmployee,
+                // 15 sal_10(tie)
+                duplicate10thSalaryEmployee);
+    }
+
+    @Nested
+    class FindAllTests {
+        @Test
+        void findAll_whenNoEmployees_returnsEmptyList_andDelegatesToClient() throws DownstreamUnavailableException {
+            // Given
+            Mockito.when(readService.findAll()).thenReturn(new ArrayList<>());
+
+            // When
+            List<Employee> result = employeeService.findAll();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertTrue(result.isEmpty());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findAll_whenEmployeesExist_returnsList_andDelegatesToClient() throws DownstreamUnavailableException {
+            // Given
+            List<Employee> employees = testEmployees.subList(0, 2);
+            Mockito.when(readService.findAll()).thenReturn(employees);
+
+            // When
+            List<Employee> result = employeeService.findAll();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(2, result.size());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findAll_whenClientRateLimited_throwsDownstreamUnavailableException()
+                throws DownstreamUnavailableException {
+            // Given
+            Mockito.when(readService.findAll()).thenThrow(new DownstreamUnavailableException());
+
+            // When
+            Assertions.assertThrows(DownstreamUnavailableException.class, () -> employeeService.findAll());
+
+            // Then
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+    }
+
+    @Nested
+    @SpringBootTest
+    class SearchTests {
+        @MockBean
+        EmployeeClient client;
+
+        @MockBean
+        EmployeeReadService readService;
+
+        @Autowired
+        EmployeeService employeeService;
+
+        @Test
+        void search_whenBlank_throwsConstraintViolationException() {
+            // Given
+            SearchInput searchInput = new SearchInput(" ");
+
+            // When
+
+            // Then
+            Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.search(searchInput));
+            Mockito.verifyNoInteractions(client);
+            Mockito.verifyNoInteractions(readService);
+        }
+
+        @Test
+        void search_whenCaseIgnoreCase_returnsMatches() throws DownstreamUnavailableException {
+            // Given
+            List<Employee> result;
+            List<Employee> expected = List.of(testEmployees.get(3), testEmployees.get(12));
+            SearchInput searchInput = new SearchInput("Rand");
+            Mockito.when(readService.findAll()).thenReturn(expected);
+
+            // When
+            result = employeeService.search(searchInput);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(expected.get(0).getName(), result.get(0).getName());
+            Assertions.assertEquals(expected.get(1).getName(), result.get(1).getName());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Disabled
+        @Test
+        void search_whenNameHasDiacritics_returnsMatches() throws DownstreamUnavailableException {
+            // Given
+            List<Employee> expected = List.of(testEmployees.get(6));
+            SearchInput searchInput = new SearchInput("Gíno");
+
+            // When
+            List<Employee> result = employeeService.search(searchInput);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(1, result.size());
+            Assertions.assertEquals(expected.get(0).getName(), result.get(0).getName());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void search_whenNoEmployeesExist_returnsEmptyList() throws DownstreamUnavailableException {
+            // Given
+            List<Employee> result;
+            SearchInput searchInput = new SearchInput("Gíno");
+            Mockito.when(readService.findAll()).thenReturn(new ArrayList<>());
+
+            // When
+            result = employeeService.search(searchInput);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertTrue(result.isEmpty());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+    }
+
+    @Nested
+    @SpringBootTest
+    class FindByIdTests {
+        @MockBean
+        EmployeeClient client;
+
+        @MockBean
+        EmployeeReadService readService;
+
+        @Autowired
+        EmployeeService employeeService;
+
+        @Test
+        void findById_whenUuidIsNull_throwsConstraintViolationException() {
+            // Given
+            String nonUuid = null;
+
+            // When
+
+            // Then
+            Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.findById(nonUuid));
+            Mockito.verifyNoInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findById_whenExists_returnsEmployee() {
+            // Given
+            var id = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            String name = "Sharda Gibson";
+            Mockito.when(readService.findAll()).thenReturn(testEmployees);
+
+            // When
+            Employee result = employeeService.findById(id);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(id, result.getId().toString());
+            Assertions.assertEquals(name, result.getName());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findById_whenNoEmployeeExists_throwEmployeeNotFoundException() {
+            // Given
+            var id = "99eff840-bc7d-4a3e-b9c8-b46bbcc4104f";
+            var uuid = UUID.fromString(id);
+            Mockito.when(readService.findAll()).thenReturn(testEmployees);
+
+            // When
+
+            // Then
+            Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.findById(id));
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+    }
+
+    @Nested
+    class FindHighestSalaryOfEmployeesTests {
+        @Test
+        void findHighestSalaryOfEmployees_whenNoEmployeesExist_returnsEmptyOptionalInt() {
+            // Given
+            Mockito.when(readService.findAll()).thenReturn(new ArrayList<>());
+
+            // When
+            OptionalInt result = employeeService.findHighestSalaryOfEmployees();
+
+            // Then
+            Assertions.assertFalse(result.isPresent());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findHighestSalaryOfEmployees_whenEmployeesWithSalariesExist_returnsHighestSalary() {
+            // Given
+            Mockito.when(readService.findAll()).thenReturn(testEmployees);
+
+            // When
+            OptionalInt result = employeeService.findHighestSalaryOfEmployees(); // 490233, idx 1
+
+            // Then
+            Assertions.assertTrue(result.isPresent());
+            Assertions.assertEquals(testEmployees.get(1).getSalary(), result.getAsInt());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+    }
+
+    @Nested
+    class FindTopTenHighestEarningEmployeesTests {
+        @Test
+        void findTopTenHighestEarningEmployees_whenNoEmployeesExist_returnsEmptyList() {
+            // Given
+            Mockito.when(readService.findAll()).thenReturn(new ArrayList<>());
+
+            // When
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertTrue(result.isEmpty());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findTopTenHighestEarningEmployees_whenEmployeesListSmall_returnsFewerThanTen() {
+            // Given
+            List<Employee> employees = testEmployees.subList(0, 5);
+            List<Employee> employeesExpectedOrder =
+                    List.of(employees.get(1), employees.get(2), employees.get(0), employees.get(3), employees.get(4));
+            Mockito.when(readService.findAll()).thenReturn(employees);
+
+            // When
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(5, result.size());
+            Assertions.assertEquals(employeesExpectedOrder.get(0).getName(), result.get(0));
+            Assertions.assertEquals(employeesExpectedOrder.get(1).getName(), result.get(1));
+            Assertions.assertEquals(employeesExpectedOrder.get(2).getName(), result.get(2));
+            Assertions.assertEquals(employeesExpectedOrder.get(3).getName(), result.get(3));
+            Assertions.assertEquals(employeesExpectedOrder.get(4).getName(), result.get(4));
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findTopTenHighestEarningEmployees_whenEmployeesExist_returnsListOfTopTenEarners() {
+            // Given
+            List<Employee> employees = new ArrayList<>(List.of(
+                    new Employee(UUID.randomUUID(), "Employee 1", 100, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 2", 200, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 3", 300, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 4", 400, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 5", 500, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 6", 600, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 7", 700, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 8", 800, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 9", 900, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 10", 1000, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 11", 1100, 20, "Test Title", "email@company.com")));
+            Collections.shuffle(employees, new Random(42));
+            Mockito.when(readService.findAll()).thenReturn(employees);
+
+            // When
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(10, result.size());
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals("Employee 11", result.get(0)),
+                    () -> Assertions.assertEquals("Employee 10", result.get(1)),
+                    () -> Assertions.assertEquals("Employee 9", result.get(2)),
+                    () -> Assertions.assertEquals("Employee 8", result.get(3)),
+                    () -> Assertions.assertEquals("Employee 7", result.get(4)),
+                    () -> Assertions.assertEquals("Employee 6", result.get(5)),
+                    () -> Assertions.assertEquals("Employee 5", result.get(6)),
+                    () -> Assertions.assertEquals("Employee 4", result.get(7)),
+                    () -> Assertions.assertEquals("Employee 3", result.get(8)),
+                    () -> Assertions.assertEquals("Employee 2", result.get(9)));
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findTopTenHighestEarningEmployees_whenSalariesTie_sortByNameAsc() {
+            List<Employee> employees = new ArrayList<>(List.of(
+                    new Employee(UUID.randomUUID(), "Employee 1", 100, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 2", 200, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 3", 300, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 4", 400, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 5", 500, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "A Employee 6", 600, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "B Employee 7", 600, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 8", 800, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 9", 900, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 10", 1000, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 11", 1100, 20, "Test Title", "email@company.com")));
+            Collections.shuffle(employees, new Random(42));
+            Mockito.when(readService.findAll()).thenReturn(employees);
+
+            // When
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(10, result.size());
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals("Employee 11", result.get(0)),
+                    () -> Assertions.assertEquals("Employee 10", result.get(1)),
+                    () -> Assertions.assertEquals("Employee 9", result.get(2)),
+                    () -> Assertions.assertEquals("Employee 8", result.get(3)),
+                    () -> Assertions.assertEquals("A Employee 6", result.get(4)),
+                    () -> Assertions.assertEquals("B Employee 7", result.get(5)),
+                    () -> Assertions.assertEquals("Employee 5", result.get(6)),
+                    () -> Assertions.assertEquals("Employee 4", result.get(7)),
+                    () -> Assertions.assertEquals("Employee 3", result.get(8)),
+                    () -> Assertions.assertEquals("Employee 2", result.get(9)));
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void findTopTenHighestEarningEmployees_whenSalariesTieAt10thPlace_sortByNameAscAndPickFirstFor10th() {
+            List<Employee> employees = new ArrayList<>(List.of(
+                    new Employee(UUID.randomUUID(), "A Employee 1", 200, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "B Employee 2", 200, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 3", 300, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 4", 400, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 5", 500, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 6", 600, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 7", 700, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 8", 800, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 9", 900, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 10", 1000, 20, "Test Title", "email@company.com"),
+                    new Employee(UUID.randomUUID(), "Employee 11", 1100, 20, "Test Title", "email@company.com")));
+            Collections.shuffle(employees, new Random(42));
+            Mockito.when(readService.findAll()).thenReturn(employees);
+
+            // When
+            List<String> result = employeeService.findTopTenHighestEarningEmployees();
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertFalse(result.isEmpty());
+            Assertions.assertEquals(10, result.size());
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals("Employee 11", result.get(0)),
+                    () -> Assertions.assertEquals("Employee 10", result.get(1)),
+                    () -> Assertions.assertEquals("Employee 9", result.get(2)),
+                    () -> Assertions.assertEquals("Employee 8", result.get(3)),
+                    () -> Assertions.assertEquals("Employee 7", result.get(4)),
+                    () -> Assertions.assertEquals("Employee 6", result.get(5)),
+                    () -> Assertions.assertEquals("Employee 5", result.get(6)),
+                    () -> Assertions.assertEquals("Employee 4", result.get(7)),
+                    () -> Assertions.assertEquals("Employee 3", result.get(8)),
+                    () -> Assertions.assertEquals("A Employee 1", result.get(9)));
+
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+    }
+
+    @Nested
+    @SpringBootTest
+    class CreateEmployeeTests {
+        @MockBean
+        EmployeeClient client;
+
+        @MockBean
+        EmployeeReadService readService;
+
+        @Autowired
+        EmployeeService employeeService;
+
+        @Test
+        void createEmployee_whenInvalidInput_throwsConstraintViolationException() {
+            // Given
+            CreateEmployeeInput employeeToCreate1 = new CreateEmployeeInput(null, -1, -2, null);
+            CreateEmployeeInput employeeToCreate2 = new CreateEmployeeInput(" ", -1, -2, " ");
+
+            // When
+
+            // Then
+            Assertions.assertAll(
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class,
+                            () -> employeeService.createEmployee(employeeToCreate1)),
+                    () -> Assertions.assertThrows(
+                            ConstraintViolationException.class,
+                            () -> employeeService.createEmployee(employeeToCreate2)));
+
+            Mockito.verifyNoInteractions(client);
+            Mockito.verifyNoInteractions(readService);
+        }
+
+        @Test
+        void createEmployee_whenValidInput_returnsCreatedEmployee_delegatesToClient() {
+            // Given
+            String name = "Test McTest";
+            int salary = 100;
+            int age = 28;
+            String title = "Lead Tester";
+            String email = "testlead@company.com";
+            UUID id = UUID.randomUUID();
+            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput(name, salary, age, title);
+
+            Employee employeeCreated = new Employee(id, name, salary, age, title, email);
+            Mockito.when(readService.findAll()).thenReturn(testEmployees);
+            Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
+
+            // When
+            Employee result = employeeService.createEmployee(employeeToCreate);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals(name, result.getName()),
+                    () -> Assertions.assertEquals(salary, result.getSalary()),
+                    () -> Assertions.assertEquals(age, result.getAge()),
+                    () -> Assertions.assertEquals(title, result.getTitle()),
+                    () -> Assertions.assertEquals(id, result.getId()),
+                    () -> Assertions.assertEquals(email, result.getEmail()));
+
+            Mockito.verify(readService).findAll();
+            Mockito.verify(client).create(employeeToCreate);
+            Mockito.verifyNoMoreInteractions(client);
+            Mockito.verifyNoMoreInteractions(readService);
+        }
+
+        @ParameterizedTest
+        @ValueSource(strings = {"Test McTest", "test mctest"})
+        void createEmployee_whenEmployeeWithSameNameExists_throwsEmployeeWithNameAlreadyExistsException(
+                String candidate) {
+            // Given
+            List<Employee> existingEmployees =
+                    List.of(new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c"));
+            var employeeToCreate = new CreateEmployeeInput(candidate, 2, 25, "Tt");
+            Mockito.when(readService.findAll()).thenReturn(existingEmployees);
+
+            // When
+            var exception = Assertions.assertThrows(
+                    EmployeeWithNameAlreadyExistsException.class,
+                    () -> employeeService.createEmployee(employeeToCreate));
+
+            // Then
+            Assertions.assertEquals(candidate, exception.getName());
+
+            Mockito.verify(readService).findAll();
+            Mockito.verify(client, Mockito.never()).create(Mockito.any());
+            Mockito.verifyNoMoreInteractions(client);
+            Mockito.verifyNoMoreInteractions(readService);
+        }
+
+        @Test
+        void createEmployee_whenEmployeeCreatedWithPartialExistingName_returnsCreatedEmployee() {
+            // Given
+            List<Employee> existingEmployees =
+                    List.of(new Employee(UUID.randomUUID(), "Test McTest", 1, 20, "T", "e@c"));
+            String name = "Test McTe"; // partial contains
+            int salary = 100;
+            int age = 28;
+            String title = "Lead Tester";
+            String email = "testlead@company.com";
+            UUID id = UUID.randomUUID();
+
+            CreateEmployeeInput employeeToCreate = new CreateEmployeeInput(name, salary, age, title);
+            Employee employeeCreated = new Employee(id, name, salary, age, title, email);
+
+            Mockito.when(readService.findAll()).thenReturn(existingEmployees);
+            Mockito.when(client.create(employeeToCreate)).thenReturn(employeeCreated);
+
+            // When
+            var result = employeeService.createEmployee(employeeToCreate);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertAll(
+                    () -> Assertions.assertEquals(name, result.getName()),
+                    () -> Assertions.assertEquals(salary, result.getSalary()),
+                    () -> Assertions.assertEquals(age, result.getAge()),
+                    () -> Assertions.assertEquals(title, result.getTitle()),
+                    () -> Assertions.assertEquals(id, result.getId()),
+                    () -> Assertions.assertEquals(email, result.getEmail()));
+
+            Mockito.verify(readService).findAll();
+            Mockito.verify(client).create(employeeToCreate);
+            Mockito.verifyNoMoreInteractions(client);
+            Mockito.verifyNoMoreInteractions(readService);
+        }
+    }
+
+    @Nested
+    @SpringBootTest
+    class DeleteEmployeeTests {
+        @MockBean
+        EmployeeClient client;
+
+        @MockBean
+        EmployeeReadService readService;
+
+        @Autowired
+        EmployeeService employeeService;
+
+        @Test
+        void deleteEmployeeById_whenIdInputIsNull_throwsConstraintViolationException() {
+            // Given
+            String id = null;
+
+            // When
+            Assertions.assertThrows(ConstraintViolationException.class, () -> employeeService.deleteEmployeeById(id));
+
+            // Then
+            Mockito.verifyNoInteractions(client);
+            Mockito.verifyNoInteractions(readService);
+        }
+
+        @Test
+        void deleteEmployeeById_whenNoEmployeeExists_throwsEmployeeNotFoundException() {
+            // Given
+            var id = "89eff840-bc7d-4a3e-b9c8-b46bbcc41043";
+            Mockito.when(readService.findAll()).thenReturn(testEmployees);
+
+            // When
+            Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
+
+            // Then
+            Mockito.verify(readService).findAll();
+            Mockito.verifyNoMoreInteractions(readService);
+            Mockito.verifyNoInteractions(client);
+        }
+
+        @Test
+        void deleteEmployeeById_whenNameResolves_deletesByName_returnsEmployeeName() throws EmployeeNotFoundException {
+            // Given
+            var idToDelete = "99eff840-bc7d-4a3e-b9c8-b46bbcc41042";
+            String nameToDelete = "Sharda Gibson";
+            Mockito.when(readService.findAll()).thenReturn(testEmployees);
+            Mockito.when(client.deleteByName(nameToDelete)).thenReturn(true);
+
+            // When
+            String result = employeeService.deleteEmployeeById(idToDelete);
+
+            // Then
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(nameToDelete, result);
+
+            Mockito.verify(readService).findAll();
+            Mockito.verify(client).deleteByName(nameToDelete);
+            Mockito.verifyNoMoreInteractions(client);
+            Mockito.verifyNoMoreInteractions(readService);
+        }
+
+        @Test
+        void deleteEmployeeById_whenClientReturnsFalse_throwsEmployeeNotFoundException() {
+            // Given
+            var uuid = UUID.randomUUID();
+            var id = uuid.toString();
+            Mockito.when(readService.findAll()).thenReturn(List.of(new Employee(uuid, "X", 100, 20, "T", "e@c")));
+            Mockito.when(client.deleteByName("X")).thenReturn(false);
+
+            // When
+            Assertions.assertThrows(EmployeeNotFoundException.class, () -> employeeService.deleteEmployeeById(id));
+
+            // Then
+            Mockito.verify(readService).findAll();
+            Mockito.verify(client).deleteByName("X");
+            Mockito.verifyNoMoreInteractions(client);
+            Mockito.verifyNoMoreInteractions(readService);
+        }
+    }
+}
