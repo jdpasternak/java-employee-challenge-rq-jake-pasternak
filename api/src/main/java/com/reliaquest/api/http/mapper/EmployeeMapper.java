@@ -1,6 +1,8 @@
-package com.reliaquest.api.http;
+package com.reliaquest.api.http.mapper;
 
 import com.reliaquest.api.exception.BadGatewayException;
+import com.reliaquest.api.http.WireCreateEmployee;
+import com.reliaquest.api.http.WireEmployee;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
 import java.util.UUID;

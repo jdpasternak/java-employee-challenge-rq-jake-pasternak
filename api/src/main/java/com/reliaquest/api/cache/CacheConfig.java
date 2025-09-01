@@ -11,11 +11,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableCaching
 @EnableConfigurationProperties(CacheProperties.class)
-public class CacheConfiguration {
+public class CacheConfig {
 
     @Bean
     CacheManager cacheManager(CacheProperties cacheProperties) {
-        var manager = new CaffeineCacheManager(CacheConstants.EMPLOYEES_ALL);
+        var manager = new CaffeineCacheManager(CacheNames.EMPLOYEES_ALL);
         manager.setCaffeine(Caffeine.newBuilder()
                 .maximumSize(cacheProperties.getMaxSize())
                 .expireAfterWrite(cacheProperties.getTtl()));

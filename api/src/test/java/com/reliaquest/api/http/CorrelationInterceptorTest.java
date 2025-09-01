@@ -3,8 +3,8 @@ package com.reliaquest.api.http;
 import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
 import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;
 
-import com.reliaquest.api.config.PropsConfig;
 import com.reliaquest.api.gateway.EmployeeClient;
+import com.reliaquest.api.log.CorrelationInterceptor;
 import com.reliaquest.api.model.CreateEmployeeInput;
 import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +21,10 @@ import org.springframework.test.web.client.match.MockRestRequestMatchers;
 import org.springframework.test.web.client.response.MockRestResponseCreators;
 
 @RestClientTest(EmployeeClient.class)
-@Import({RestClientConfig.class, DownstreamErrorHandler.class, CorrelationInterceptor.class, PropsConfig.class})
+@Import({RestClientConfig.class,
+        DownstreamErrorHandler.class,
+        CorrelationInterceptor.class,
+})
 class CorrelationInterceptorTest {
 
     @Autowired

@@ -1,6 +1,6 @@
 package com.reliaquest.api.service;
 
-import static com.reliaquest.api.cache.CacheConstants.EMPLOYEES_ALL;
+import static com.reliaquest.api.cache.CacheNames.EMPLOYEES_ALL;
 
 import com.reliaquest.api.gateway.EmployeeClient;
 import com.reliaquest.api.model.Employee;

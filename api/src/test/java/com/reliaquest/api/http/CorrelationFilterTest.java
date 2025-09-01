@@ -5,6 +5,7 @@ import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
 import com.reliaquest.api.controller.EmployeeController;
 import com.reliaquest.api.controller.EmployeeControllerAdvice;
 import com.reliaquest.api.exception.DownstreamUnavailableException;
+import com.reliaquest.api.log.CorrelationFilter;
 import com.reliaquest.api.model.Employee;
 import com.reliaquest.api.service.EmployeeService;
 import java.util.List;

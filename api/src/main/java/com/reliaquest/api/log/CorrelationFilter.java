@@ -1,4 +1,4 @@
-package com.reliaquest.api.http;
+package com.reliaquest.api.log;
 
 import static com.reliaquest.api.http.HttpConstants.Headers.X_CORRELATION_ID;
 import static com.reliaquest.api.log.LogConstants.MDCKeys.CORRELATION_ID;

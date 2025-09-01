@@ -1,4 +1,4 @@
-package com.reliaquest.api.http;
+package com.reliaquest.api.errors;
 
 public enum ErrorCode {
     VALIDATION_FAILED,

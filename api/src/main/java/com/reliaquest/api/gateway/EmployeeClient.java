@@ -4,7 +4,7 @@ import static com.reliaquest.api.gateway.GatewayConstants.EMPLOYEE_ENDPOINT;
 import static com.reliaquest.api.gateway.GatewayConstants.NAME;
 
 import com.reliaquest.api.exception.DownstreamUnavailableException;
-import com.reliaquest.api.http.EmployeeMapper;
+import com.reliaquest.api.http.mapper.EmployeeMapper;
 import com.reliaquest.api.http.Envelope;
 import com.reliaquest.api.http.WireEmployee;
 import com.reliaquest.api.model.CreateEmployeeInput;

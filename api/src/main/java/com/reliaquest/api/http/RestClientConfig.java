@@ -1,6 +1,7 @@
 package com.reliaquest.api.http;
 
 import com.reliaquest.api.config.EmployeeApiProperties;
+import com.reliaquest.api.log.CorrelationInterceptor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
