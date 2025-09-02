@@ -30,10 +30,10 @@ public final class EmployeeMapper {
         }
 
         return new Employee(
-                UUID.fromString(wireEmployee.id()),
+                id,
                 wireEmployee.employeeName(),
-                wireEmployee.employeeSalary(),
-                wireEmployee.employeeAge(),
+                salary,
+                age,
                 wireEmployee.employeeTitle(),
                 wireEmployee.employeeEmail());
     }

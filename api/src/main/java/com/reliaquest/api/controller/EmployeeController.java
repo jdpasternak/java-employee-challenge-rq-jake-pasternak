@@ -2,7 +2,6 @@ package com.reliaquest.api.controller;
 
 import com.reliaquest.api.model.CreateEmployeeInput;
 import com.reliaquest.api.model.Employee;
-import com.reliaquest.api.model.SearchInput;
 import com.reliaquest.api.service.EmployeeService;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +30,7 @@ public class EmployeeController implements IEmployeeController<Employee, CreateE
 
     @Override
     public ResponseEntity<List<Employee>> getEmployeesByNameSearch(String searchString) {
-        var matchedEmployees = employeeService.search(new SearchInput(searchString));
+        var matchedEmployees = employeeService.search(searchString);
         if (matchedEmployees.isEmpty()) {
             return ResponseEntity.noContent().build();
         } else {
